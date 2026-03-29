@@ -1,6 +1,6 @@
-# OpenSAK — Open Source geocaching management tool
+# OpenSAK — Open Source Swiss Army Knife for Geocaching
 
-Et open source geocaching-styringsværktøj til **Linux**, **Windows** og **macOS** — en moderne, cross-platform efterfølger til GSAK, bygget i Python.
+A modern, cross-platform geocaching management tool for **Linux**, **Windows** and **macOS** — a free, open source successor to GSAK, built in Python.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![PySide6](https://img.shields.io/badge/GUI-PySide6-green)
@@ -9,55 +9,62 @@ Et open source geocaching-styringsværktøj til **Linux**, **Windows** og **macO
 
 ---
 
-## Funktioner
+## Features
 
 ### Import & Database
-- 📥 **Import** af GPX filer og Pocket Query ZIP filer fra Geocaching.com
-- 🗄️ **Flere databaser** — hold f.eks. Sjælland, Bornholm og Cypern adskilt
-- 📍 **Centerpunkt per database** — afstande beregnes fra dit valgte udgangspunkt
-- ✅ **Opdater fund** fra en reference database (f.eks. "Mine Fund" PQ)
+- 📥 **Import** GPX files and Pocket Query ZIP files from Geocaching.com
+- 🗄️ **Multiple databases** — keep regions separate (e.g. Zealand, Bornholm, Cyprus)
+- 📍 **Centre point per database** — distances calculated from your chosen home location
+- ✅ **Update finds** from a reference database (e.g. your "My Finds" PQ)
 
-### Visning & Navigation
-- 🗺️ **Interaktivt kort** med OpenStreetMap og farvekodet cache-pins
-- 🔍 **Avanceret filter dialog** — 3 faner: Generelt, Datoer og Attributter
-- 📊 **Valgfrie kolonner** — 17+ kolonner kan slås til/fra
-- 🎨 **Status ikoner** i listen — ✅ fundet, ❌ DNF, 🔒 arkiveret, ⚠️ utilgængelig
-- 🔗 **Klik på GC kode** → åbner cache-siden på geocaching.com
-- 🗺️ **Klik på koordinat** → åbner i Google Maps eller OpenStreetMap
+### View & Navigation
+- 🗺️ **Interactive map** with OpenStreetMap and colour-coded cache pins with clustering
+- 🔍 **Advanced filter dialog** — 3 tabs: General, Dates and Attributes (~70 Groundspeak attributes)
+- 📊 **Configurable columns** — 17+ columns, toggle on/off
+- 🎨 **Status icons** in list — ✅ found, ❌ DNF, 🔒 archived, ⚠️ unavailable
+- 🔗 **Click GC code** → opens cache page on geocaching.com
+- 🗺️ **Click coordinates** → opens in Google Maps or OpenStreetMap
 
-### Cache detaljer
-- 📋 **Cache detaljer** — beskrivelse, hints og logs
-- 🔓 **ROT13 hint dekodning** — ét klik dekoder/genskjuler hintet
-- 🔍 **Søg i logs** — realtidssøgning med fremhævning af matches
-- ✏️ **Tilføj/rediger/slet** caches manuelt
+### Cache Details
+- 📋 **Cache details** — description, hints and logs
+- 🔓 **ROT13 hint decoding** — one click to decode / re-hide the hint
+- 🔍 **Search in logs** — real-time search with match highlighting
+- ✏️ **Add / edit / delete** caches manually
 
-### Højreklik menu
-- 🌐 Åbn på geocaching.com
-- 🗺️ Åbn i kortapp (Google Maps / OpenStreetMap)
-- 📋 Kopiér GC kode / koordinater
-- ☑ Marker som fundet/ikke fundet
+### Right-click Menu
+- 🌐 Open on geocaching.com
+- 🗺️ Open in map app (Google Maps / OpenStreetMap)
+- 📋 Copy GC code / coordinates
+- ☑ Mark as found / not found
+
+### GPS Export
+- 📤 **Send to Garmin GPS** — auto-detects USB-mounted Garmin devices
+- 🗑️ **Optional: delete existing GPX files** on device before upload
+- 💾 **Save as GPX file** — export to any location
+
+### Language Support
+- 🌍 **Danish and English** built in
+- 🔧 **Easy to add new languages** — copy one file, translate, done
 
 ---
 
-## Kendte begrænsninger (Beta)
+## Known Limitations (Beta)
 
-- Favorite points importeres ikke fra GPX/PQ filer
-- Ingen Geocaching.com Live API integration (planlagt)
-- Ingen GPS device export endnu (under udvikling)
-- Ingen rapport/export funktion endnu (under udvikling)
-- macOS og Windows er ikke testet endnu — feedback modtages gerne!
+- Favourite points cannot be imported from GPX/PQ files (requires Geocaching.com API)
+- No Geocaching.com Live API integration
+- macOS and Windows not yet fully tested — feedback welcome!
 
 ---
 
-## Systemkrav
+## System Requirements
 
-| Platform | Krav |
+| Platform | Requirement |
 |---|---|
 | **Linux** | Ubuntu 20.04+ / Linux Mint 20+ / Debian 11+ |
-| **Windows** | Windows 10 eller nyere |
-| **macOS** | macOS 11 (Big Sur) eller nyere |
-| **Python** | 3.10 eller nyere |
-| **Diskplads** | Ca. 500 MB (inkl. PySide6) |
+| **Windows** | Windows 10 or newer |
+| **macOS** | macOS 11 (Big Sur) or newer |
+| **Python** | 3.10 or newer |
+| **Disk space** | ~500 MB (including PySide6) |
 
 ---
 
@@ -80,13 +87,11 @@ pip install -r requirements.txt
 python run.py
 ```
 
----
-
 ### Windows
 
-**Installer Python 3.10+** fra [python.org](https://www.python.org/downloads/) — husk flueben ved **"Add Python to PATH"**
+Install **Python 3.10+** from [python.org](https://www.python.org/downloads/) — make sure to check **"Add Python to PATH"**
 
-**Installer Git** fra [git-scm.com](https://git-scm.com/download/win)
+Install **Git** from [git-scm.com](https://git-scm.com/download/win)
 
 ```powershell
 cd $env:USERPROFILE
@@ -98,13 +103,12 @@ pip install -r requirements.txt
 python run.py
 ```
 
----
-
 ### macOS
 
-> ⚠️ macOS er ikke testet endnu. Feedback modtages meget gerne!
+> ⚠️ macOS is not yet fully tested. Feedback is very welcome!
 
 ```bash
+xcode-select --install   # if not already installed
 brew install python git
 
 cd ~
@@ -118,42 +122,65 @@ python run.py
 
 ---
 
-## Kom i gang — første brug
+## Getting Started
 
-### 1. Hent en Pocket Query fra Geocaching.com
-1. Log ind på [geocaching.com](https://www.geocaching.com)
-2. Gå til **Pocket Queries** under dit profilmenu
-3. Hent en Pocket Query som en `.zip` fil
+### 1. Get a Pocket Query from Geocaching.com
+1. Log in at [geocaching.com](https://www.geocaching.com)
+2. Go to **Pocket Queries** in your profile menu
+3. Download a Pocket Query as a `.zip` file
 
-### 2. Importer i OpenSAK
-1. Start OpenSAK med `python run.py`
-2. Klik **Importer GPX / PQ zip** i menulinjen
-3. Vælg din `.zip` fil og klik **Importer**
+### 2. Import into OpenSAK
+1. Start OpenSAK with `python run.py`
+2. Click **Import GPX / PQ zip** in the menu bar
+3. Select your `.zip` file and click **Import**
 
-### 3. Sæt dit centerpunkt
-1. Gå til **Funktioner → Indstillinger**
-2. Indtast din hjemkoordinat (breddegrad / længdegrad)
-3. Vælg foretrukken kortapp (Google Maps eller OpenStreetMap)
+### 3. Set your home location
+1. Go to **Tools → Settings**
+2. Enter your home coordinates (latitude / longitude)
+3. Choose your preferred map app (Google Maps or OpenStreetMap)
 
-### 4. Filtrer og find caches
-- **Hurtigfilter** — dropdown øverst i vinduet
-- **Avanceret filter** — klik 🔍 **Filter** i toolbar (Ctrl+F)
-  - Generelt, Datoer og ~70 Groundspeak attributter
-  - Gem filterprofiler til genbrug
-
----
-
-## Opdater fundne caches fra "My Finds"
-
-1. Hent din **"My Finds"** Pocket Query fra geocaching.com
-2. Opret en ny database kaldet "Mine Fund" i OpenSAK
-3. Importer My Finds ZIP filen i den database
-4. Skift til den database du vil opdatere
-5. Gå til **Funktioner → Opdater fund fra reference database**
+### 4. Filter and find caches
+- **Quick filter** — dropdown at the top of the window
+- **Advanced filter** — click 🔍 **Filter** in the toolbar (Ctrl+F)
+  - General, Dates and ~70 Groundspeak attributes
+  - Save filter profiles for reuse
 
 ---
 
-## Opdater til nyeste version
+## Updating Finds from "My Finds"
+
+1. Download your **"My Finds"** Pocket Query from geocaching.com
+2. Create a new database called "My Finds" in OpenSAK
+3. Import the My Finds ZIP file into that database
+4. Switch back to the database you want to update
+5. Go to **Tools → Update finds from reference database**
+
+---
+
+## Changing the Language
+
+1. Go to **Tools → Settings**
+2. Select your language in the **Language** section
+3. Restart OpenSAK — the new language takes effect on next startup
+
+Currently supported: **Danish (da)**, **English (en)**
+
+### Adding a New Language
+1. Copy `src/opensak/lang/en.py` to e.g. `src/opensak/lang/de.py`
+2. Translate the string values (keys must not be changed)
+3. Register the language in `src/opensak/lang/__init__.py`:
+   ```python
+   AVAILABLE_LANGUAGES = {
+       "da": "Dansk",
+       "en": "English",
+       "de": "Deutsch",   # ← add this line
+   }
+   ```
+4. Submit a Pull Request — contributions welcome!
+
+---
+
+## Updating to the Latest Version
 
 ```bash
 cd ~/opensak
@@ -167,32 +194,38 @@ python run.py
 
 ---
 
-## Rapporter fejl
+## Reporting Bugs
 
-Brug [GitHub Issues](https://github.com/AgreeDK/opensak/issues) og inkludér:
-- Din platform (Linux/Windows/macOS + version)
+Please use [GitHub Issues](https://github.com/AgreeDK/opensak/issues) and include:
+- Your platform (Linux / Windows / macOS + version)
 - Python version: `python3 --version`
-- Fejlbesked fra terminalen
+- The error message from the terminal (if any)
 
 ---
 
-## Projektstruktur
+## Project Structure
 
 ```
 opensak/
-├── run.py                              # Start programmet herfra
+├── run.py                          # Entry point
 ├── requirements.txt
 ├── src/opensak/
-│   ├── app.py
-│   ├── config.py
+│   ├── app.py                      # Startup + migration
+│   ├── config.py                   # Paths + language preference
+│   ├── lang/                       # Language files
+│   │   ├── __init__.py             # i18n engine (tr() function)
+│   │   ├── da.py                   # Danish
+│   │   └── en.py                   # English
 │   ├── db/
-│   │   ├── models.py
-│   │   ├── database.py
-│   │   ├── manager.py
-│   │   └── found_updater.py
-│   ├── importer/
+│   │   ├── models.py               # SQLAlchemy ORM models
+│   │   ├── database.py             # Session management
+│   │   ├── manager.py              # Multiple databases
+│   │   └── found_updater.py        # Update finds from reference DB
+│   ├── importer/                   # GPX + PQ ZIP importer
 │   ├── filters/
-│   │   └── engine.py                   # 18 filtertyper med AND/OR logik
+│   │   └── engine.py               # 18 filter types, AND/OR, profiles
+│   ├── gps/
+│   │   └── garmin.py               # Garmin detection + GPX generator
 │   └── gui/
 │       ├── mainwindow.py
 │       ├── cache_table.py
@@ -200,39 +233,50 @@ opensak/
 │       ├── map_widget.py
 │       ├── settings.py
 │       └── dialogs/
-│           ├── filter_dialog.py        # Avanceret filter (3 faner)
+│           ├── filter_dialog.py    # Advanced filter (3 tabs)
 │           ├── import_dialog.py
 │           ├── waypoint_dialog.py
 │           ├── column_dialog.py
 │           ├── database_dialog.py
 │           ├── found_dialog.py
+│           ├── gps_dialog.py
 │           └── settings_dialog.py
 └── tests/
+    ├── test_db.py                  # 13 tests
+    ├── test_importer.py            # 11 tests
+    └── test_filters.py             # 39 tests
 ```
 
 ---
 
-## Køreplan
+## Roadmap
 
-- [ ] GPS device export (Garmin og andre)
-- [ ] HTML/PDF rapporter og statistik
-- [ ] Sprogfiler (engelsk, tysk m.fl.)
-- [ ] Favorite points (kræver Geocaching.com API)
+- [ ] HTML/PDF reports and statistics
+- [ ] GPS export — improve auto-detection on all Linux distros
+- [ ] Favourite points (requires Geocaching.com API)
 - [ ] Windows installer (.exe)
 - [ ] Linux AppImage
+- [ ] More languages (German, Swedish, …)
+- [ ] GitHub Actions CI/CD pipeline
 
 ---
 
-## Licens
+## Contributing
 
-MIT License — se [LICENSE](LICENSE) filen for detaljer.
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
-## Tak til
+## License
 
-- [OpenStreetMap](https://www.openstreetmap.org) for kortdata
-- [Leaflet.js](https://leafletjs.com) for kortbiblioteket
-- [PySide6 / Qt](https://www.qt.io) for GUI frameworket
-- [SQLAlchemy](https://www.sqlalchemy.org) for databaselaget
-- Alle der har testet og givet feedback!
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+## Acknowledgements
+
+- [OpenStreetMap](https://www.openstreetmap.org) for map tiles
+- [Leaflet.js](https://leafletjs.com) for the map library
+- [PySide6 / Qt](https://www.qt.io) for the GUI framework
+- [SQLAlchemy](https://www.sqlalchemy.org) for the database layer
+- Everyone who has tested the app and provided feedback!
