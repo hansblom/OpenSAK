@@ -359,6 +359,91 @@ def _indent(elem, level: int = 0) -> None:
             elem.tail = indent
 
 
+# ── Slet GPX filer fra enhed ──────────────────────────────────────────────────
+
+class DeleteResult:
+    """Resultat af sletning af GPX filer fra GPS enhed."""
+
+    def __init__(self):
+        self.device:        Optional[Path] = None
+        self.deleted_files: list[Path]     = []
+        self.failed_files:  list[Path]     = []
+        self.error:         Optional[str]  = None
+
+    @property
+    def success(self) -> bool:
+        return self.error is None
+
+    @property
+    def deleted_count(self) -> int:
+        return len(self.deleted_files)
+
+    @property
+    def failed_count(self) -> int:
+        return len(self.failed_files)
+
+    def __str__(self) -> str:
+        if not self.success:
+            return f"✗ Fejl ved sletning: {self.error}"
+        if self.deleted_count == 0:
+            return "ℹ️  Ingen GPX filer fundet på enheden"
+        lines = [f"🗑️  {self.deleted_count} GPX fil(er) slettet fra enheden"]
+        for f in self.deleted_files:
+            lines.append(f"   - {f.name}")
+        if self.failed_count:
+            lines.append(f"⚠️  {self.failed_count} fil(er) kunne ikke slettes:")
+            for f in self.failed_files:
+                lines.append(f"   - {f.name}")
+        return "\n".join(lines)
+
+
+def delete_gpx_files(
+    device_root: Path,
+    pattern: str = "*.gpx",
+) -> DeleteResult:
+    """
+    Slet alle GPX filer i Garmin/GPX mappen på enheden.
+
+    Parameters
+    ----------
+    device_root : Rod-sti til GPS enheden
+    pattern     : Glob-mønster for filer der skal slettes (standard: *.gpx)
+
+    Returns
+    -------
+    DeleteResult med liste over slettede og fejlede filer.
+    """
+    result = DeleteResult()
+    result.device = device_root
+
+    try:
+        gpx_dir = get_garmin_gpx_path(device_root)
+
+        if not gpx_dir.exists():
+            # Mappen findes ikke — intet at slette, det er OK
+            return result
+
+        gpx_files = list(gpx_dir.glob(pattern))
+
+        for gpx_file in gpx_files:
+            if not gpx_file.is_file():
+                continue
+            try:
+                gpx_file.unlink()
+                result.deleted_files.append(gpx_file)
+            except (PermissionError, OSError):
+                result.failed_files.append(gpx_file)
+
+    except PermissionError:
+        result.error = "Adgang nægtet — er GPS enheden skrivebeskyttet?"
+    except OSError as e:
+        result.error = f"Fil fejl: {e}"
+    except Exception as e:
+        result.error = f"Uventet fejl: {e}"
+
+    return result
+
+
 # ── Export til enhed ──────────────────────────────────────────────────────────
 
 class ExportResult:

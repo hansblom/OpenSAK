@@ -14,8 +14,27 @@ from PySide6.QtWidgets import (
     QPushButton, QComboBox, QLineEdit, QTextEdit,
     QProgressBar, QGroupBox, QRadioButton,
     QFileDialog, QButtonGroup, QSpinBox,
-    QCheckBox
+    QCheckBox, QMessageBox
 )
+
+
+class DeleteWorker(QThread):
+    """Kører sletning af GPX filer i baggrundstråd."""
+    finished = Signal(object)
+    error    = Signal(str)
+
+    def __init__(self, device_path: Path):
+        super().__init__()
+        self.device_path = device_path
+
+    def run(self) -> None:
+        try:
+            from opensak.gps.garmin import delete_gpx_files
+            result = delete_gpx_files(self.device_path)
+            self.finished.emit(result)
+        except Exception:
+            import traceback
+            self.error.emit(traceback.format_exc())
 
 
 class ExportWorker(QThread):
@@ -55,6 +74,7 @@ class GpsExportDialog(QDialog):
         self.setMinimumWidth(520)
         self._caches = caches or []
         self._worker = None
+        self._delete_worker = None
         self._setup_ui()
         self._scan_devices()
 
@@ -143,6 +163,16 @@ class GpsExportDialog(QDialog):
         max_row.addStretch()
         opt_layout.addLayout(max_row)
 
+        # Slet eksisterende GPX filer
+        self._cb_delete_gpx = QCheckBox(
+            "Slet eksisterende GPX filer på GPS inden upload"
+        )
+        self._cb_delete_gpx.setToolTip(
+            "Sletter alle .gpx filer i Garmin/GPX mappen på enheden\n"
+            "inden den nye fil uploades. Virker kun ved direkte GPS-upload."
+        )
+        opt_layout.addWidget(self._cb_delete_gpx)
+
         layout.addWidget(opt_group)
 
         # ── Progress og resultat ──────────────────────────────────────────────
@@ -204,6 +234,9 @@ class GpsExportDialog(QDialog):
     def _on_mode_changed(self, device_checked: bool) -> None:
         self._device_combo.setEnabled(device_checked)
         self._scan_btn.setEnabled(device_checked)
+        self._cb_delete_gpx.setEnabled(device_checked)
+        if not device_checked:
+            self._cb_delete_gpx.setChecked(False)
 
     def _browse_file(self) -> None:
         from opensak.config import get_app_data_dir
@@ -234,16 +267,73 @@ class GpsExportDialog(QDialog):
             self._log.setPlainText("Vælg en destination først.")
             return
 
-        filename = self._filename.text().strip() or "opensak"
+        filename  = self._filename.text().strip() or "opensak"
         max_caches = self._max_caches.value()
+        do_delete  = (
+            self._cb_delete_gpx.isChecked()
+            and self._rb_device.isChecked()
+        )
+
+        # ── Bekræft sletning ──────────────────────────────────────────────────
+        if do_delete:
+            from opensak.gps.garmin import get_garmin_gpx_path
+            gpx_dir = get_garmin_gpx_path(dest)
+            existing = list(gpx_dir.glob("*.gpx")) if gpx_dir.exists() else []
+            count    = len(existing)
+
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Bekræft sletning")
+            msg.setIcon(QMessageBox.Warning)
+            if count > 0:
+                msg.setText(
+                    f"<b>{count} GPX fil(er)</b> vil blive slettet fra GPS enheden "
+                    f"inden upload.\n\nEr du sikker?"
+                )
+                details = "\n".join(f.name for f in existing)
+                msg.setDetailedText(f"Filer der slettes:\n{details}")
+            else:
+                msg.setText(
+                    "Ingen eksisterende GPX filer fundet på enheden.\n"
+                    "Vil du fortsætte med upload?"
+                )
+            msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            msg.setDefaultButton(QMessageBox.Cancel)
+            if msg.exec() != QMessageBox.Ok:
+                return
 
         self._export_btn.setEnabled(False)
         self._progress.setVisible(True)
-        self._log.setPlainText(f"Eksporterer {len(self._caches)} caches…")
 
-        self._worker = ExportWorker(
-            self._caches, dest, filename, max_caches
+        if do_delete:
+            self._log.setPlainText(
+                f"🗑️  Sletter eksisterende GPX filer fra GPS enheden…"
+            )
+            self._delete_worker = DeleteWorker(dest)
+            self._delete_worker.finished.connect(
+                lambda res: self._on_delete_finished(res, dest, filename, max_caches)
+            )
+            self._delete_worker.error.connect(self._on_error)
+            self._delete_worker.start()
+        else:
+            self._run_export(dest, filename, max_caches)
+
+    def _on_delete_finished(
+        self,
+        delete_result,
+        dest: Path,
+        filename: str,
+        max_caches: int,
+    ) -> None:
+        """Kaldt når sletning er færdig — fortsæt med export."""
+        self._log.setPlainText(
+            str(delete_result) + "\n\nEksporterer caches…"
         )
+        self._run_export(dest, filename, max_caches)
+
+    def _run_export(self, dest: Path, filename: str, max_caches: int) -> None:
+        """Start selve export-arbejderen."""
+        self._log.append(f"📤  Eksporterer {len(self._caches)} caches…")
+        self._worker = ExportWorker(self._caches, dest, filename, max_caches)
         self._worker.finished.connect(self._on_finished)
         self._worker.error.connect(self._on_error)
         self._worker.start()
