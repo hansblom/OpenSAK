@@ -55,16 +55,38 @@ def main():
     print("✓ .desktop fil skrevet")
 
     # Lav AppRun script
-    # LIBGL_ALWAYS_SOFTWARE=1 og QT_XCB_GL_INTEGRATION=none undgår GLX
-    # versionskonflikter mellem AppImage's Qt-libs og host systemets OpenGL
+    # QtWebEngine er IKKE pakket med i AppImage (for svær at distribuere).
+    # AppRun finder systemets PySide6 og bruger dets QtWebEngine i stedet.
     apprun = "\n".join([
         "#!/bin/bash",
         'HERE="$(dirname "$(readlink -f "${0}")")"',
+        "",
+        "# Tjek at PySide6 er installeret på systemet",
+        'if ! python3 -c "import PySide6" 2>/dev/null; then',
+        '  echo "OpenSAK kræver PySide6. Installer med:"',
+        '  echo "  pip install PySide6"',
+        '  echo "eller:"',
+        '  echo "  pip3 install PySide6"',
+        '  read -p "Installer nu? [J/n]: " svar',
+        '  svar=${svar:-J}',
+        '  if [[ "$svar" =~ ^[JjYy]$ ]]; then',
+        '    pip3 install PySide6 || pip install PySide6',
+        '  else',
+        '    exit 1',
+        '  fi',
+        'fi',
+        "",
+        "# Find systemets PySide6 og tilføj til PYTHONPATH",
+        'PYSIDE6_PATH=$(python3 -c "import PySide6, os; print(os.path.dirname(PySide6.__file__))" 2>/dev/null)',
+        'PYTHON_STDLIB=$(python3 -c "import sysconfig; print(sysconfig.get_path(\'stdlib\'))" 2>/dev/null)',
+        'PYTHON_SITE=$(python3 -c "import site; print(site.getsitepackages()[0])" 2>/dev/null)',
+        'export PYTHONPATH="${PYTHON_SITE}:${PYTHON_STDLIB}:${PYTHONPATH}"',
+        "",
+        "# Sæt stier for den pakkede applikation",
         'export PATH="${HERE}/usr/bin:${PATH}"',
-        'export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/bin:${LD_LIBRARY_PATH}"',
-        'export QT_PLUGIN_PATH="${HERE}/usr/bin/PySide6/Qt/plugins"',
-        'export LIBGL_ALWAYS_SOFTWARE=1',
-        'export QT_XCB_GL_INTEGRATION=none',
+        'export LD_LIBRARY_PATH="${HERE}/usr/bin/_internal:${LD_LIBRARY_PATH}"',
+        "",
+        "# Start OpenSAK",
         'exec "${HERE}/usr/bin/OpenSAK" "$@"',
         "",
     ])
