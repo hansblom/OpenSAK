@@ -55,12 +55,16 @@ def main():
     print("✓ .desktop fil skrevet")
 
     # Lav AppRun script
+    # LIBGL_ALWAYS_SOFTWARE=1 og QT_XCB_GL_INTEGRATION=none undgår GLX
+    # versionskonflikter mellem AppImage's Qt-libs og host systemets OpenGL
     apprun = "\n".join([
         "#!/bin/bash",
         'HERE="$(dirname "$(readlink -f "${0}")")"',
         'export PATH="${HERE}/usr/bin:${PATH}"',
         'export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/bin:${LD_LIBRARY_PATH}"',
         'export QT_PLUGIN_PATH="${HERE}/usr/bin/PySide6/Qt/plugins"',
+        'export LIBGL_ALWAYS_SOFTWARE=1',
+        'export QT_XCB_GL_INTEGRATION=none',
         'exec "${HERE}/usr/bin/OpenSAK" "$@"',
         "",
     ])
