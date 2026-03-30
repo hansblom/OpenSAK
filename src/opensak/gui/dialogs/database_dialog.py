@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 )
 
 from opensak.db.manager import DatabaseManager, DatabaseInfo, get_db_manager
+from opensak.lang import tr
 
 
 class NewDatabaseDialog(QDialog):
@@ -22,7 +23,7 @@ class NewDatabaseDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Ny database")
+        self.setWindowTitle(tr("db_new_title"))
         self.setMinimumWidth(380)
         self._setup_ui()
 
@@ -32,7 +33,7 @@ class NewDatabaseDialog(QDialog):
 
         self._name_edit = QLineEdit()
         self._name_edit.setPlaceholderText("f.eks. Sjælland, Bornholm 2026…")
-        form.addRow("Navn:", self._name_edit)
+        form.addRow(tr("db_name_label"), self._name_edit)
 
         layout.addLayout(form)
         layout.addWidget(QLabel(
@@ -42,10 +43,10 @@ class NewDatabaseDialog(QDialog):
 
         path_row = QHBoxLayout()
         self._path_edit = QLineEdit()
-        self._path_edit.setPlaceholderText("(standard placering)")
+        self._path_edit.setPlaceholderText(tr("db_default_path"))
         self._path_edit.setReadOnly(True)
         path_row.addWidget(self._path_edit)
-        browse_btn = QPushButton("Vælg…")
+        browse_btn = QPushButton(tr("gps_browse"))
         browse_btn.setMaximumWidth(70)
         browse_btn.clicked.connect(self._browse)
         path_row.addWidget(browse_btn)
@@ -64,9 +65,9 @@ class NewDatabaseDialog(QDialog):
     def _browse(self) -> None:
         from opensak.config import get_app_data_dir
         path, _ = QFileDialog.getSaveFileName(
-            self, "Vælg placering",
+            self, tr("db_browse_title"),
             str(get_app_data_dir()),
-            "SQLite database (*.db)"
+            tr("db_file_filter")
         )
         if path:
             self._custom_path = Path(path)
@@ -75,7 +76,7 @@ class NewDatabaseDialog(QDialog):
     def _validate(self) -> None:
         name = self._name_edit.text().strip()
         if not name:
-            QMessageBox.warning(self, "Mangler navn", "Indtast et navn til databasen.")
+            QMessageBox.warning(self, tr("warning"), tr("db_name_required"))
             return
         self.accept()
 
@@ -99,7 +100,7 @@ class DatabaseManagerDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Administrer databaser")
+        self.setWindowTitle(tr("db_dialog_title"))
         self.setMinimumSize(560, 400)
         self._manager = get_db_manager()
         self._setup_ui()
@@ -110,7 +111,7 @@ class DatabaseManagerDialog(QDialog):
 
         # ── Venstre: database liste ───────────────────────────────────────────
         left = QVBoxLayout()
-        left.addWidget(QLabel("<b>Databaser:</b>"))
+        left.addWidget(QLabel(f"<b>{tr('db_list_label')}</b>"))
 
         self._list = QListWidget()
         self._list.setMinimumWidth(220)
@@ -123,55 +124,55 @@ class DatabaseManagerDialog(QDialog):
         right = QVBoxLayout()
 
         # Detaljer
-        info_group = QGroupBox("Detaljer")
+        info_group = QGroupBox(tr("db_details_group"))
         info_form = QFormLayout(info_group)
         self._info_name  = QLabel("—")
         self._info_path  = QLabel("—")
         self._info_path.setWordWrap(True)
         self._info_size  = QLabel("—")
         self._info_mod   = QLabel("—")
-        info_form.addRow("Navn:",     self._info_name)
-        info_form.addRow("Sti:",      self._info_path)
-        info_form.addRow("Størrelse:", self._info_size)
-        info_form.addRow("Ændret:",   self._info_mod)
+        info_form.addRow(tr("db_name_label"),     self._info_name)
+        info_form.addRow(tr("db_path_label"),      self._info_path)
+        info_form.addRow(tr("db_size_label"), self._info_size)
+        info_form.addRow(tr("db_modified_label"),   self._info_mod)
         right.addWidget(info_group)
 
         # Knapper
         btn_layout = QVBoxLayout()
 
-        self._btn_switch = QPushButton("⟵  Skift til denne")
+        self._btn_switch = QPushButton(tr("db_switch_btn"))
         self._btn_switch.setEnabled(False)
         self._btn_switch.clicked.connect(self._switch_to_selected)
         btn_layout.addWidget(self._btn_switch)
 
         btn_layout.addSpacing(8)
 
-        self._btn_new = QPushButton("＋  Ny database…")
+        self._btn_new = QPushButton(tr("db_new_btn"))
         self._btn_new.clicked.connect(self._new_database)
         btn_layout.addWidget(self._btn_new)
 
-        self._btn_open = QPushButton("📂  Åbn eksisterende…")
+        self._btn_open = QPushButton(tr("db_open_btn"))
         self._btn_open.clicked.connect(self._open_database)
         btn_layout.addWidget(self._btn_open)
 
-        self._btn_copy = QPushButton("⎘  Kopiér…")
+        self._btn_copy = QPushButton(tr("db_copy_btn"))
         self._btn_copy.setEnabled(False)
         self._btn_copy.clicked.connect(self._copy_database)
         btn_layout.addWidget(self._btn_copy)
 
-        self._btn_rename = QPushButton("✎  Omdøb…")
+        self._btn_rename = QPushButton(tr("db_rename_btn"))
         self._btn_rename.setEnabled(False)
         self._btn_rename.clicked.connect(self._rename_database)
         btn_layout.addWidget(self._btn_rename)
 
         btn_layout.addSpacing(8)
 
-        self._btn_remove = QPushButton("✕  Fjern fra liste")
+        self._btn_remove = QPushButton(tr("db_remove_btn"))
         self._btn_remove.setEnabled(False)
         self._btn_remove.clicked.connect(self._remove_from_list)
         btn_layout.addWidget(self._btn_remove)
 
-        self._btn_delete = QPushButton("🗑  Slet permanent…")
+        self._btn_delete = QPushButton(tr("db_delete_btn"))
         self._btn_delete.setEnabled(False)
         self._btn_delete.setStyleSheet("color: #c62828;")
         self._btn_delete.clicked.connect(self._delete_database)
@@ -179,7 +180,7 @@ class DatabaseManagerDialog(QDialog):
 
         btn_layout.addStretch()
 
-        close_btn = QPushButton("Luk")
+        close_btn = QPushButton(tr("close"))
         close_btn.clicked.connect(self.accept)
         btn_layout.addWidget(close_btn)
 
@@ -199,7 +200,7 @@ class DatabaseManagerDialog(QDialog):
                 item.setText(f"{db.name}  ✓")
             if not db.exists:
                 item.setForeground(Qt.GlobalColor.gray)
-                item.setToolTip("Filen blev ikke fundet")
+                item.setToolTip(tr("db_file_not_found"))
             self._list.addItem(item)
 
     def _selected_db(self) -> DatabaseInfo | None:
@@ -215,7 +216,7 @@ class DatabaseManagerDialog(QDialog):
         if db:
             self._info_name.setText(db.name)
             self._info_path.setText(str(db.path))
-            self._info_size.setText(f"{db.size_mb:.2f} MB" if db.exists else "Ikke fundet")
+            self._info_size.setText(f"{db.size_mb:.2f} MB" if db.exists else tr("db_not_found"))
             self._info_mod.setText(
                 db.modified.strftime("%d.%m.%Y %H:%M") if db.modified else "—"
             )
@@ -238,8 +239,8 @@ class DatabaseManagerDialog(QDialog):
         self._refresh_list()
         self.database_switched.emit(db)
         QMessageBox.information(
-            self, "Database skiftet",
-            f"Aktiv database er nu:\n{db.name}"
+            self, tr("db_switched_title"),
+            tr("db_switched_msg", name=db.name)
         )
 
     def _new_database(self) -> None:
@@ -249,8 +250,8 @@ class DatabaseManagerDialog(QDialog):
                 db = self._manager.new_database(dlg.name, dlg.custom_path)
                 self._refresh_list()
                 QMessageBox.information(
-                    self, "Database oprettet",
-                    f"'{db.name}' er oprettet.\n\nBrug 'Skift til denne' for at aktivere den."
+                    self, tr("db_created_title"),
+                    tr("db_created_msg", name=db.name)
                 )
             except ValueError as e:
                 QMessageBox.warning(self, "Fejl", str(e))
@@ -258,17 +259,17 @@ class DatabaseManagerDialog(QDialog):
     def _open_database(self) -> None:
         from opensak.config import get_app_data_dir
         path, _ = QFileDialog.getOpenFileName(
-            self, "Åbn database",
+            self, tr("db_open_browse_title"),
             str(get_app_data_dir()),
-            "SQLite database (*.db)"
+            tr("db_file_filter")
         )
         if path:
             try:
                 db = self._manager.open_database(Path(path))
                 self._refresh_list()
                 QMessageBox.information(
-                    self, "Database åbnet",
-                    f"'{db.name}' er tilføjet til listen."
+                    self, tr("db_opened_title"),
+                    tr("db_opened_msg", name=db.name)
                 )
             except Exception as e:
                 QMessageBox.warning(self, "Fejl", str(e))
@@ -278,17 +279,17 @@ class DatabaseManagerDialog(QDialog):
         if not db:
             return
         name, ok = self._simple_input(
-            "Kopiér database",
-            "Navn på kopien:",
-            f"{db.name} (kopi)"
+            tr("db_copy_title"),
+            tr("db_copy_name_label"),
+            f"{db.name} ({tr('db_copy_suffix')})"
         )
         if ok and name:
             try:
                 new_db = self._manager.copy_database(db, name)
                 self._refresh_list()
                 QMessageBox.information(
-                    self, "Kopi oprettet",
-                    f"'{new_db.name}' er oprettet som kopi af '{db.name}'."
+                    self, tr("db_copied_title"),
+                    tr("db_copied_msg", new_name=new_db.name, orig_name=db.name)
                 )
             except Exception as e:
                 QMessageBox.warning(self, "Fejl", str(e))
@@ -297,7 +298,7 @@ class DatabaseManagerDialog(QDialog):
         db = self._selected_db()
         if not db:
             return
-        name, ok = self._simple_input("Omdøb database", "Nyt navn:", db.name)
+        name, ok = self._simple_input(tr("db_rename_title"), tr("db_rename_label"), db.name)
         if ok and name and name != db.name:
             try:
                 self._manager.rename(db, name)
@@ -310,8 +311,8 @@ class DatabaseManagerDialog(QDialog):
         if not db:
             return
         reply = QMessageBox.question(
-            self, "Fjern fra liste",
-            f"Fjern '{db.name}' fra listen?\n\nFilen slettes IKKE.",
+            self, tr("db_remove_title"),
+            tr("db_remove_msg", name=db.name),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply == QMessageBox.StandardButton.Yes:
@@ -326,9 +327,8 @@ class DatabaseManagerDialog(QDialog):
         if not db:
             return
         reply = QMessageBox.warning(
-            self, "Slet database permanent",
-            f"Er du sikker på at du vil slette '{db.name}' permanent?\n\n"
-            f"Filen {db.path} vil blive slettet og kan ikke gendannes!",
+            self, tr("db_delete_confirm_title"),
+            tr("db_delete_confirm_msg", name=db.name, path=db.path),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )

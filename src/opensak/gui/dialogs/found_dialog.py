@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 )
 
 from opensak.db.manager import get_db_manager
+from opensak.lang import tr
 
 
 class UpdateWorker(QThread):
@@ -46,7 +47,7 @@ class FoundUpdaterDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Opdater fund fra reference database")
+        self.setWindowTitle(tr("found_dialog_title"))
         self.setMinimumWidth(520)
         self._worker: UpdateWorker | None = None
         self._reference_path: Path | None = None
@@ -77,11 +78,11 @@ class FoundUpdaterDialog(QDialog):
         layout.addWidget(active_lbl)
 
         # ── Vælg reference database ───────────────────────────────────────────
-        ref_group = QGroupBox("Reference database (Mine Fund)")
+        ref_group = QGroupBox(tr("found_ref_group"))
         ref_layout = QVBoxLayout(ref_group)
 
         # Radio: vælg fra kendte databaser
-        self._rb_known = QRadioButton("Vælg fra kendte databaser:")
+        self._rb_known = QRadioButton(tr("found_rb_known"))
         self._rb_known.setChecked(True)
         ref_layout.addWidget(self._rb_known)
 
@@ -98,14 +99,14 @@ class FoundUpdaterDialog(QDialog):
         ref_layout.addWidget(self._db_combo)
 
         # Radio: vælg fil
-        self._rb_file = QRadioButton("Vælg en .db fil:")
+        self._rb_file = QRadioButton(tr("found_rb_file"))
         ref_layout.addWidget(self._rb_file)
 
         file_row = QHBoxLayout()
-        self._file_lbl = QLabel("(ingen fil valgt)")
+        self._file_lbl = QLabel(tr("found_no_file"))
         self._file_lbl.setStyleSheet("color: gray;")
         file_row.addWidget(self._file_lbl, stretch=1)
-        browse_btn = QPushButton("Vælg…")
+        browse_btn = QPushButton(tr("gps_browse"))
         browse_btn.clicked.connect(self._browse_file)
         file_row.addWidget(browse_btn)
         ref_layout.addLayout(file_row)
@@ -127,17 +128,17 @@ class FoundUpdaterDialog(QDialog):
         self._log = QTextEdit()
         self._log.setReadOnly(True)
         self._log.setMaximumHeight(130)
-        self._log.setPlaceholderText("Resultat vises her efter opdatering…")
+        self._log.setPlaceholderText(tr("found_log_placeholder"))
         layout.addWidget(self._log)
 
         # ── Knapper ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
-        self._update_btn = QPushButton("⟳  Opdater fund")
+        self._update_btn = QPushButton(tr("found_update_btn"))
         self._update_btn.setStyleSheet("font-weight: bold;")
         self._update_btn.clicked.connect(self._start_update)
         btn_row.addWidget(self._update_btn)
 
-        close_btn = QPushButton("Luk")
+        close_btn = QPushButton(tr("close"))
         close_btn.clicked.connect(self.accept)
         btn_row.addWidget(close_btn)
         layout.addLayout(btn_row)
@@ -148,9 +149,9 @@ class FoundUpdaterDialog(QDialog):
     def _browse_file(self) -> None:
         from opensak.config import get_app_data_dir
         path, _ = QFileDialog.getOpenFileName(
-            self, "Vælg reference database",
+            self, tr("found_browse_title"),
             str(get_app_data_dir()),
-            "SQLite database (*.db)"
+            tr("db_file_filter")
         )
         if path:
             self._reference_path = Path(path)
@@ -168,19 +169,17 @@ class FoundUpdaterDialog(QDialog):
     def _start_update(self) -> None:
         ref_path = self._get_reference_path()
         if not ref_path:
-            self._log.setPlainText("Vælg en reference database først.")
+            self._log.setPlainText(tr("found_select_ref_first"))
             return
 
         manager = get_db_manager()
         if manager.active and ref_path == manager.active.path:
-            self._log.setPlainText(
-                "Reference databasen må ikke være den samme som den aktive database."
-            )
+            self._log.setPlainText(tr("found_same_db_error"))
             return
 
         self._update_btn.setEnabled(False)
         self._progress.setVisible(True)
-        self._log.setPlainText(f"Opdaterer fra: {ref_path.name}…")
+        self._log.setPlainText(tr("found_running_file", name=ref_path.name))
 
         self._worker = UpdateWorker(ref_path)
         self._worker.finished.connect(self._on_finished)

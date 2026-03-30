@@ -9,6 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QThread, Signal
+from opensak.lang import tr
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QComboBox, QLineEdit, QTextEdit,
@@ -70,7 +71,7 @@ class GpsExportDialog(QDialog):
 
     def __init__(self, parent=None, caches=None):
         super().__init__(parent)
-        self.setWindowTitle("Send til GPS")
+        self.setWindowTitle(tr("gps_dialog_title"))
         self.setMinimumWidth(520)
         self._caches = caches or []
         self._worker = None
@@ -83,18 +84,15 @@ class GpsExportDialog(QDialog):
         layout.setSpacing(10)
 
         # ── Info ──────────────────────────────────────────────────────────────
-        count_lbl = QLabel(
-            f"<b>{len(self._caches)} caches</b> klar til eksport "
-            f"(de aktuelt filtrerede/viste caches)"
-        )
+        count_lbl = QLabel(tr("gps_caches_ready", count=len(self._caches)))
         layout.addWidget(count_lbl)
 
         # ── Destination ───────────────────────────────────────────────────────
-        dest_group = QGroupBox("Destination")
+        dest_group = QGroupBox(tr("gps_dest_group"))
         dest_layout = QVBoxLayout(dest_group)
 
         # Auto-detekterede enheder
-        self._rb_device = QRadioButton("Send direkte til GPS enhed:")
+        self._rb_device = QRadioButton(tr("gps_rb_device"))
         self._rb_device.setChecked(True)
         dest_layout.addWidget(self._rb_device)
 
@@ -103,7 +101,7 @@ class GpsExportDialog(QDialog):
         self._device_combo.setMinimumWidth(300)
         device_row.addWidget(self._device_combo)
 
-        self._scan_btn = QPushButton("🔍 Scan")
+        self._scan_btn = QPushButton(tr("gps_scan_btn"))
         self._scan_btn.setMaximumWidth(80)
         self._scan_btn.clicked.connect(self._scan_devices)
         device_row.addWidget(self._scan_btn)
@@ -114,15 +112,15 @@ class GpsExportDialog(QDialog):
         dest_layout.addWidget(self._device_info)
 
         # Gem som fil
-        self._rb_file = QRadioButton("Gem som GPX fil:")
+        self._rb_file = QRadioButton(tr("gps_rb_file"))
         dest_layout.addWidget(self._rb_file)
 
         file_row = QHBoxLayout()
         self._file_path = QLineEdit()
-        self._file_path.setPlaceholderText("Vælg placering…")
+        self._file_path.setPlaceholderText(tr("gps_file_placeholder"))
         self._file_path.setReadOnly(True)
         file_row.addWidget(self._file_path)
-        browse_btn = QPushButton("Vælg…")
+        browse_btn = QPushButton(tr("gps_browse"))
         browse_btn.setMaximumWidth(80)
         browse_btn.clicked.connect(self._browse_file)
         file_row.addWidget(browse_btn)
@@ -137,12 +135,12 @@ class GpsExportDialog(QDialog):
         layout.addWidget(dest_group)
 
         # ── Indstillinger ─────────────────────────────────────────────────────
-        opt_group = QGroupBox("Indstillinger")
+        opt_group = QGroupBox(tr("gps_opt_group"))
         opt_layout = QVBoxLayout(opt_group)
 
         # Filnavn
         name_row = QHBoxLayout()
-        name_row.addWidget(QLabel("Filnavn:"))
+        name_row.addWidget(QLabel(tr("gps_filename_label")))
         self._filename = QLineEdit("opensak")
         self._filename.setMaximumWidth(200)
         name_row.addWidget(self._filename)
@@ -152,20 +150,20 @@ class GpsExportDialog(QDialog):
 
         # Max antal caches
         max_row = QHBoxLayout()
-        max_row.addWidget(QLabel("Max antal caches:"))
+        max_row.addWidget(QLabel(tr("gps_max_label")))
         self._max_caches = QSpinBox()
         self._max_caches.setRange(0, 5000)
         self._max_caches.setValue(500)
-        self._max_caches.setSpecialValueText("Alle")
+        self._max_caches.setSpecialValueText(tr("gps_max_all"))
         self._max_caches.setMaximumWidth(100)
         max_row.addWidget(self._max_caches)
-        max_row.addWidget(QLabel("(0 = alle)"))
+        max_row.addWidget(QLabel(tr("gps_max_hint")))
         max_row.addStretch()
         opt_layout.addLayout(max_row)
 
         # Slet eksisterende GPX filer
         self._cb_delete_gpx = QCheckBox(
-            "Slet eksisterende GPX filer på GPS inden upload"
+            tr("gps_delete_cb")
         )
         self._cb_delete_gpx.setToolTip(
             "Sletter alle .gpx filer i Garmin/GPX mappen på enheden\n"
@@ -184,17 +182,17 @@ class GpsExportDialog(QDialog):
         self._log = QTextEdit()
         self._log.setReadOnly(True)
         self._log.setMaximumHeight(120)
-        self._log.setPlaceholderText("Status vises her…")
+        self._log.setPlaceholderText(tr("gps_log_placeholder"))
         layout.addWidget(self._log)
 
         # ── Knapper ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
-        self._export_btn = QPushButton("📤  Send til GPS")
+        self._export_btn = QPushButton(tr("gps_export_btn"))
         self._export_btn.setStyleSheet("font-weight: bold;")
         self._export_btn.clicked.connect(self._start_export)
         btn_row.addWidget(self._export_btn)
 
-        close_btn = QPushButton("Luk")
+        close_btn = QPushButton(tr("close"))
         close_btn.clicked.connect(self.accept)
         btn_row.addWidget(close_btn)
         layout.addLayout(btn_row)
@@ -206,7 +204,7 @@ class GpsExportDialog(QDialog):
         from opensak.gps.garmin import find_garmin_devices
         self._device_combo.clear()
 
-        self._scan_btn.setText("⏳")
+        self._scan_btn.setText(tr("gps_scan_scanning"))
         self._scan_btn.setEnabled(False)
 
         devices = find_garmin_devices()
@@ -215,20 +213,17 @@ class GpsExportDialog(QDialog):
             for dev in devices:
                 self._device_combo.addItem(str(dev), dev)
             self._device_info.setText(
-                f"✓ {len(devices)} Garmin enhed(er) fundet"
+                tr("gps_devices_found", count=len(devices))
             )
             self._device_info.setStyleSheet("color: #2e7d32; font-size: 10px;")
             self._export_btn.setEnabled(True)
         else:
-            self._device_combo.addItem("(Ingen GPS enhed fundet)")
-            self._device_info.setText(
-                "Ingen Garmin enhed fundet — tilslut din GPS og klik Scan igen, "
-                "eller brug 'Gem som GPX fil'"
-            )
+            self._device_combo.addItem(tr("gps_no_device"))
+            self._device_info.setText(tr("gps_no_device_hint"))
             self._device_info.setStyleSheet("color: #c62828; font-size: 10px;")
             self._rb_file.setChecked(True)
 
-        self._scan_btn.setText("🔍 Scan")
+        self._scan_btn.setText(tr("gps_scan_btn"))
         self._scan_btn.setEnabled(True)
 
     def _on_mode_changed(self, device_checked: bool) -> None:
@@ -264,7 +259,7 @@ class GpsExportDialog(QDialog):
     def _start_export(self) -> None:
         dest = self._get_destination()
         if not dest:
-            self._log.setPlainText("Vælg en destination først.")
+            self._log.setPlainText(tr("gps_no_dest"))
             return
 
         filename  = self._filename.text().strip() or "opensak"
@@ -282,19 +277,17 @@ class GpsExportDialog(QDialog):
             count    = len(existing)
 
             msg = QMessageBox(self)
-            msg.setWindowTitle("Bekræft sletning")
+            msg.setWindowTitle(tr("gps_confirm_delete_title"))
             msg.setIcon(QMessageBox.Warning)
             if count > 0:
                 msg.setText(
-                    f"<b>{count} GPX fil(er)</b> vil blive slettet fra GPS enheden "
-                    f"inden upload.\n\nEr du sikker?"
+                    tr("gps_confirm_delete_msg", count=count)
                 )
                 details = "\n".join(f.name for f in existing)
-                msg.setDetailedText(f"Filer der slettes:\n{details}")
+                msg.setDetailedText(tr("gps_delete_file_list", files=details))
             else:
                 msg.setText(
-                    "Ingen eksisterende GPX filer fundet på enheden.\n"
-                    "Vil du fortsætte med upload?"
+                    tr("gps_confirm_no_files_msg")
                 )
             msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
             msg.setDefaultButton(QMessageBox.Cancel)
@@ -305,9 +298,7 @@ class GpsExportDialog(QDialog):
         self._progress.setVisible(True)
 
         if do_delete:
-            self._log.setPlainText(
-                f"🗑️  Sletter eksisterende GPX filer fra GPS enheden…"
-            )
+            self._log.setPlainText(tr("gps_deleting"))
             self._delete_worker = DeleteWorker(dest)
             self._delete_worker.finished.connect(
                 lambda res: self._on_delete_finished(res, dest, filename, max_caches)
@@ -332,7 +323,7 @@ class GpsExportDialog(QDialog):
 
     def _run_export(self, dest: Path, filename: str, max_caches: int) -> None:
         """Start selve export-arbejderen."""
-        self._log.append(f"📤  Eksporterer {len(self._caches)} caches…")
+        self._log.append(tr("gps_exporting", count=len(self._caches)))
         self._worker = ExportWorker(self._caches, dest, filename, max_caches)
         self._worker.finished.connect(self._on_finished)
         self._worker.error.connect(self._on_error)

@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QFont
 
 from opensak.db.models import Cache
+from opensak.lang import tr
 
 
 class CacheDetailPanel(QWidget):
@@ -30,7 +31,7 @@ class CacheDetailPanel(QWidget):
         layout.setSpacing(4)
 
         # ── Header ────────────────────────────────────────────────────────────
-        self._title = QLabel("Vælg en cache")
+        self._title = QLabel(tr("detail_select_cache"))
         font = QFont()
         font.setPointSize(13)
         font.setBold(True)
@@ -47,7 +48,7 @@ class CacheDetailPanel(QWidget):
 
         self._gc_code_lbl  = self._meta_label("—")
         self._gc_code_lbl.setCursor(Qt.CursorShape.PointingHandCursor)
-        self._gc_code_lbl.setToolTip("Klik for at åbne på geocaching.com")
+        self._gc_code_lbl.setToolTip(tr("detail_gc_tooltip"))
         self._gc_code_lbl.mousePressEvent = self._open_on_geocaching
         self._type_lbl     = self._meta_label("—")
         self._dt_lbl       = self._meta_label("—")
@@ -55,16 +56,16 @@ class CacheDetailPanel(QWidget):
         self._country_lbl  = self._meta_label("—")
         self._coords_lbl   = self._meta_label("—")
         self._coords_lbl.setCursor(Qt.CursorShape.PointingHandCursor)
-        self._coords_lbl.setToolTip("Klik for at åbne i Google Maps")
+        self._coords_lbl.setToolTip(tr("detail_coords_tooltip"))
         self._coords_lbl.mousePressEvent = self._open_in_maps
 
         for lbl, caption in [
-            (self._gc_code_lbl,   "GC Kode"),
-            (self._type_lbl,      "Type"),
-            (self._dt_lbl,        "D / T"),
-            (self._container_lbl, "Container"),
-            (self._country_lbl,   "Land"),
-            (self._coords_lbl,    "Koordinater"),
+            (self._gc_code_lbl,   tr("detail_gc_code")),
+            (self._type_lbl,      tr("detail_type")),
+            (self._dt_lbl,        tr("detail_dt")),
+            (self._container_lbl, tr("detail_container")),
+            (self._country_lbl,   tr("detail_country")),
+            (self._coords_lbl,    tr("detail_coords")),
         ]:
             col = QVBoxLayout()
             col.setSpacing(1)
@@ -88,7 +89,7 @@ class CacheDetailPanel(QWidget):
 
         self._desc_browser = QTextBrowser()
         self._desc_browser.setOpenExternalLinks(True)
-        self._tabs.addTab(self._desc_browser, "Beskrivelse")
+        self._tabs.addTab(self._desc_browser, tr("detail_tab_desc"))
 
         hint_widget = QWidget()
         hint_layout = QVBoxLayout(hint_widget)
@@ -96,7 +97,7 @@ class CacheDetailPanel(QWidget):
         hint_layout.setSpacing(4)
 
         hint_btn_row = QHBoxLayout()
-        self._decode_btn = QPushButton("🔓  Dekod hint (ROT13)")
+        self._decode_btn = QPushButton(tr("detail_decode_btn"))
         self._decode_btn.setMaximumWidth(200)
         self._decode_btn.clicked.connect(self._toggle_hint_decode)
         self._hint_decoded = False
@@ -106,7 +107,7 @@ class CacheDetailPanel(QWidget):
 
         self._hint_browser = QTextBrowser()
         hint_layout.addWidget(self._hint_browser)
-        self._tabs.addTab(hint_widget, "Hint")
+        self._tabs.addTab(hint_widget, tr("detail_tab_hint"))
 
         log_widget = QWidget()
         log_layout = QVBoxLayout(log_widget)
@@ -117,7 +118,7 @@ class CacheDetailPanel(QWidget):
         from PySide6.QtWidgets import QLineEdit
         log_search_row = QHBoxLayout()
         self._log_search = QLineEdit()
-        self._log_search.setPlaceholderText("Søg i logs…")
+        self._log_search.setPlaceholderText(tr("detail_log_search_placeholder"))
         self._log_search.setMaximumWidth(250)
         self._log_search.textChanged.connect(self._filter_logs)
         log_search_row.addWidget(self._log_search)
@@ -126,7 +127,7 @@ class CacheDetailPanel(QWidget):
 
         self._log_browser = QTextBrowser()
         log_layout.addWidget(self._log_browser)
-        self._tabs.addTab(log_widget, "Logs")
+        self._tabs.addTab(log_widget, tr("detail_tab_logs"))
 
         layout.addWidget(self._tabs)
 
@@ -153,10 +154,10 @@ class CacheDetailPanel(QWidget):
                 )
             ) if self._raw_hint else ""
             self._hint_browser.setPlainText(decoded)
-            self._decode_btn.setText("🔒  Skjul hint")
+            self._decode_btn.setText(tr("detail_hide_hint_btn"))
         else:
-            self._hint_browser.setPlainText(self._raw_hint or "(Intet hint)")
-            self._decode_btn.setText("🔓  Dekod hint (ROT13)")
+            self._hint_browser.setPlainText(self._raw_hint or tr("detail_no_hint"))
+            self._decode_btn.setText(tr("detail_decode_btn"))
 
     def _open_in_maps(self, event=None) -> None:
         """Åbn koordinater i kortapp i standard browseren."""
@@ -176,7 +177,7 @@ class CacheDetailPanel(QWidget):
         self._current_lat = None
         self._current_lon = None
         self._coords_lbl.setStyleSheet("")
-        self._title.setText("Vælg en cache fra listen")
+        self._title.setText(tr("detail_select_cache"))
         self._gc_code_lbl.setText("—")
         self._gc_code_lbl.setStyleSheet("")
         self._current_gc_code = None
@@ -194,7 +195,7 @@ class CacheDetailPanel(QWidget):
         self._log_browser.setHtml("")
         self._raw_hint = ""
         self._hint_decoded = False
-        self._decode_btn.setText("🔓  Dekod hint (ROT13)")
+        self._decode_btn.setText(tr("detail_decode_btn"))
         self._log_search.setText("")
         self._cached_logs = []
 
@@ -202,7 +203,7 @@ class CacheDetailPanel(QWidget):
         """Populate the panel with data from *cache*."""
         # Title
         found_mark = " ✓" if cache.found else ""
-        archived_mark = " [ARKIVERET]" if cache.archived else ""
+        archived_mark = tr("detail_archived_mark") if cache.archived else ""
         self._title.setText(f"{cache.name}{found_mark}{archived_mark}")
 
         # Meta — GC kode som klikbart link
@@ -242,7 +243,7 @@ class CacheDetailPanel(QWidget):
         # Placed by / date
         parts = []
         if cache.placed_by:
-            parts.append(f"Udlagt af: {cache.placed_by}")
+            parts.append(tr("detail_placed_by", name=cache.placed_by))
         if cache.hidden_date:
             parts.append(f"Dato: {cache.hidden_date.strftime('%d.%m.%Y')}")
         self._placed_lbl.setText("   |   ".join(parts))
@@ -259,14 +260,14 @@ class CacheDetailPanel(QWidget):
             else:
                 self._desc_browser.setPlainText(cache.short_description)
         else:
-            self._desc_browser.setPlainText("(Ingen beskrivelse)")
+            self._desc_browser.setPlainText(tr("detail_no_description"))
 
         # Hint — gem rå hint og nulstil decode state
         self._raw_hint = cache.encoded_hints or ""
         self._hint_decoded = False
-        self._decode_btn.setText("🔓  Dekod hint (ROT13)")
+        self._decode_btn.setText(tr("detail_decode_btn"))
         self._hint_browser.setPlainText(
-            self._raw_hint if self._raw_hint else "(Intet hint)"
+            self._raw_hint if self._raw_hint else tr("detail_no_hint")
         )
 
         # Logs — show up to 10 most recent
@@ -281,13 +282,13 @@ class CacheDetailPanel(QWidget):
         # Gem alle logs til søgning
         self._cached_logs = logs
         self._log_search.setText("")
-        self._tabs.setTabText(2, f"Logs ({len(logs)})" if logs else "Logs")
+        self._tabs.setTabText(2, tr("detail_tab_logs_count", count=len(logs)) if logs else tr("detail_tab_logs"))
         self._render_log_html(logs)
 
     def _render_log_html(self, logs: list, filter_text: str = "") -> None:
         """Render logs som HTML, evt. filtreret."""
         if not logs:
-            self._log_browser.setPlainText("(Ingen logs)")
+            self._log_browser.setPlainText(tr("detail_no_logs"))
             return
 
         colours = {
@@ -307,9 +308,7 @@ class CacheDetailPanel(QWidget):
             ]
 
         if not filtered:
-            self._log_browser.setPlainText(
-                f"(Ingen logs matcher '{filter_text}')"
-            )
+            self._log_browser.setPlainText(tr("detail_no_logs_match", text=filter_text))
             return
 
         html = []

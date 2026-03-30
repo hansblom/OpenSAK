@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from opensak.db.models import Cache
+from opensak.lang import tr
 
 
 # ── Konstanter ────────────────────────────────────────────────────────────────
@@ -53,7 +54,7 @@ class WaypointDialog(QDialog):
         super().__init__(parent)
         self._cache = cache
         self._is_edit = cache is not None
-        self.setWindowTitle("Rediger cache" if self._is_edit else "Tilføj cache")
+        self.setWindowTitle(tr("wp_dialog_title_edit") if self._is_edit else tr("wp_dialog_title_add"))
         self.setMinimumSize(520, 580)
         self._setup_ui()
         if self._is_edit:
@@ -127,7 +128,7 @@ class WaypointDialog(QDialog):
         dt_layout.addStretch()
         basic_layout.addRow("D / T:", dt_layout)
 
-        tabs.addTab(basic, "Grundlæggende")
+        tabs.addTab(basic, tr("wp_tab_basic"))
 
         # ── Fane 2: Detaljer ──────────────────────────────────────────────────
         details = QWidget()
@@ -160,7 +161,7 @@ class WaypointDialog(QDialog):
         self._hints.setPlaceholderText("Hint til cachen")
         details_layout.addRow("Hint:", self._hints)
 
-        tabs.addTab(details, "Detaljer")
+        tabs.addTab(details, tr("wp_tab_details"))
 
         # ── Fane 3: Status ────────────────────────────────────────────────────
         status = QWidget()
@@ -186,7 +187,7 @@ class WaypointDialog(QDialog):
         self._favorite = QCheckBox("Favorit ★")
         status_layout.addRow("", self._favorite)
 
-        tabs.addTab(status, "Status")
+        tabs.addTab(status, tr("wp_tab_status"))
 
         layout.addWidget(tabs)
 
@@ -241,13 +242,13 @@ class WaypointDialog(QDialog):
         name = self._name.text().strip()
 
         if not gc_code:
-            QMessageBox.warning(self, "Mangler data", "GC Kode er påkrævet.")
+            QMessageBox.warning(self, tr("warning"), tr("wp_val_gc_required"))
             return
         if not gc_code.startswith("GC"):
-            QMessageBox.warning(self, "Ugyldig GC Kode", "GC Kode skal starte med 'GC'.")
+            QMessageBox.warning(self, tr("warning"), tr("wp_val_gc_invalid"))
             return
         if not name:
-            QMessageBox.warning(self, "Mangler data", "Navn er påkrævet.")
+            QMessageBox.warning(self, tr("warning"), tr("wp_val_name_required"))
             return
 
         self.accept()

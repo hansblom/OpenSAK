@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QDate
 
+from opensak.lang import tr
 from opensak.filters.engine import (
     FilterSet, SortSpec,
     CacheTypeFilter, ContainerFilter,
@@ -139,8 +140,8 @@ class TriStateBox(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(4)
-        self._ja  = QCheckBox("Ja")
-        self._nej = QCheckBox("Nej")
+        self._ja  = QCheckBox(tr("filter_yes"))
+        self._nej = QCheckBox(tr("filter_no"))
         layout.addWidget(self._ja)
         layout.addWidget(self._nej)
 
@@ -167,7 +168,7 @@ class FilterDialog(QDialog):
 
     def __init__(self, parent=None, current_filterset: Optional[FilterSet] = None):
         super().__init__(parent)
-        self.setWindowTitle("Sæt filter")
+        self.setWindowTitle(tr("filter_dialog_title"))
         self.setMinimumSize(620, 640)
         self._attr_boxes: dict[int, TriStateBox] = {}
         self._setup_ui()
@@ -182,22 +183,22 @@ class FilterDialog(QDialog):
 
         # ── Gem/indlæs profil ─────────────────────────────────────────────────
         profile_row = QHBoxLayout()
-        profile_row.addWidget(QLabel("Gemt filter:"))
+        profile_row.addWidget(QLabel(tr("filter_saved_label")))
         self._profile_combo = QComboBox()
         self._profile_combo.setMinimumWidth(180)
-        self._profile_combo.addItem("(Intet)", None)
+        self._profile_combo.addItem(tr("filter_none"), None)
         self._load_profiles_into_combo()
         self._profile_combo.currentIndexChanged.connect(self._on_profile_selected)
         profile_row.addWidget(self._profile_combo)
 
-        save_btn = QPushButton("💾  Gem")
+        save_btn = QPushButton(tr("filter_save_btn"))
         save_btn.setMaximumWidth(80)
         save_btn.clicked.connect(self._save_profile)
         profile_row.addWidget(save_btn)
 
         del_btn = QPushButton("🗑")
         del_btn.setMaximumWidth(40)
-        del_btn.setToolTip("Slet valgt profil")
+        del_btn.setToolTip(tr("filter_delete_profile_tooltip"))
         del_btn.clicked.connect(self._delete_profile)
         profile_row.addWidget(del_btn)
 
@@ -206,30 +207,30 @@ class FilterDialog(QDialog):
 
         # ── Faneblade ─────────────────────────────────────────────────────────
         self._tabs = QTabWidget()
-        self._tabs.addTab(self._build_general_tab(), "Generelt")
-        self._tabs.addTab(self._build_dates_tab(), "Datoer")
-        self._tabs.addTab(self._build_attributes_tab(), "Attributter")
+        self._tabs.addTab(self._build_general_tab(), tr("filter_tab_general"))
+        self._tabs.addTab(self._build_dates_tab(), tr("filter_tab_dates"))
+        self._tabs.addTab(self._build_attributes_tab(), tr("filter_tab_attributes"))
         layout.addWidget(self._tabs)
 
         # ── Knapper ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
 
-        apply_btn = QPushButton("⚡  Udfør")
+        apply_btn = QPushButton(tr("filter_apply_btn"))
         apply_btn.setStyleSheet("font-weight: bold;")
         apply_btn.clicked.connect(self._apply)
         btn_row.addWidget(apply_btn)
 
-        reset_btn = QPushButton("↺  Reset alle")
+        reset_btn = QPushButton(tr("filter_reset_all_btn"))
         reset_btn.clicked.connect(self._reset_all)
         btn_row.addWidget(reset_btn)
 
-        reset_tab_btn = QPushButton("↺  Reset fane")
+        reset_tab_btn = QPushButton(tr("filter_reset_tab_btn"))
         reset_tab_btn.clicked.connect(self._reset_current_tab)
         btn_row.addWidget(reset_tab_btn)
 
         btn_row.addStretch()
 
-        cancel_btn = QPushButton("Annuller")
+        cancel_btn = QPushButton(tr("cancel"))
         cancel_btn.clicked.connect(self.reject)
         btn_row.addWidget(cancel_btn)
 
@@ -244,21 +245,21 @@ class FilterDialog(QDialog):
 
         # Cachenavn
         self._name_filter = QLineEdit()
-        self._name_filter.setPlaceholderText("Indeholder tekst…")
-        layout.addRow("Cachenavn:", self._name_filter)
+        self._name_filter.setPlaceholderText(tr("filter_contains_placeholder"))
+        layout.addRow(tr("filter_name_label"), self._name_filter)
 
         # GC kode
         self._gc_filter = QLineEdit()
         self._gc_filter.setPlaceholderText("f.eks. GC123")
-        layout.addRow("GC Kode:", self._gc_filter)
+        layout.addRow(tr("filter_gc_label"), self._gc_filter)
 
         # Udlagt af
         self._placed_filter = QLineEdit()
-        self._placed_filter.setPlaceholderText("Indeholder tekst…")
-        layout.addRow("Udlagt af:", self._placed_filter)
+        self._placed_filter.setPlaceholderText(tr("filter_contains_placeholder"))
+        layout.addRow(tr("filter_placed_by_label"), self._placed_filter)
 
         # Cache type
-        type_group = QGroupBox("Cache type")
+        type_group = QGroupBox(tr("filter_cache_type_group"))
         type_layout = QGridLayout(type_group)
         self._type_checks: dict[str, QCheckBox] = {}
         for i, ct in enumerate(CACHE_TYPES):
@@ -269,7 +270,7 @@ class FilterDialog(QDialog):
         layout.addRow(type_group)
 
         # Container
-        cont_group = QGroupBox("Container størrelse")
+        cont_group = QGroupBox(tr("filter_container_group"))
         cont_layout = QHBoxLayout(cont_group)
         self._cont_checks: dict[str, QCheckBox] = {}
         for cs in CONTAINER_SIZES:
@@ -280,7 +281,7 @@ class FilterDialog(QDialog):
         layout.addRow(cont_group)
 
         # Sværhedsgrad
-        dt_group = QGroupBox("Sværhedsgrad / Terræn")
+        dt_group = QGroupBox(tr("filter_dt_group"))
         dt_layout = QFormLayout(dt_group)
 
         d_row = QHBoxLayout()
@@ -294,12 +295,12 @@ class FilterDialog(QDialog):
         self._diff_max.setSingleStep(0.5)
         self._diff_max.setDecimals(1)
         self._diff_max.setValue(5.0)
-        d_row.addWidget(QLabel("Fra:"))
+        d_row.addWidget(QLabel(tr("filter_from")))
         d_row.addWidget(self._diff_min)
-        d_row.addWidget(QLabel("Til:"))
+        d_row.addWidget(QLabel(tr("filter_to")))
         d_row.addWidget(self._diff_max)
         d_row.addStretch()
-        dt_layout.addRow("Sværhedsgrad:", d_row)
+        dt_layout.addRow(tr("filter_difficulty_label"), d_row)
 
         t_row = QHBoxLayout()
         self._terr_min = QDoubleSpinBox()
@@ -312,20 +313,20 @@ class FilterDialog(QDialog):
         self._terr_max.setSingleStep(0.5)
         self._terr_max.setDecimals(1)
         self._terr_max.setValue(5.0)
-        t_row.addWidget(QLabel("Fra:"))
+        t_row.addWidget(QLabel(tr("filter_from")))
         t_row.addWidget(self._terr_min)
-        t_row.addWidget(QLabel("Til:"))
+        t_row.addWidget(QLabel(tr("filter_to")))
         t_row.addWidget(self._terr_max)
         t_row.addStretch()
-        dt_layout.addRow("Terræn:", t_row)
+        dt_layout.addRow(tr("filter_terrain_label"), t_row)
         layout.addRow(dt_group)
 
         # Fundet status
-        found_group = QGroupBox("Fundet status")
+        found_group = QGroupBox(tr("filter_found_group"))
         found_layout = QHBoxLayout(found_group)
-        self._found_cb   = QCheckBox("Fundet")
+        self._found_cb   = QCheckBox(tr("quick_found"))
         self._found_cb.setChecked(True)
-        self._notfound_cb = QCheckBox("Ikke fundet")
+        self._notfound_cb = QCheckBox(tr("quick_not_found"))
         self._notfound_cb.setChecked(True)
         found_layout.addWidget(self._found_cb)
         found_layout.addWidget(self._notfound_cb)
@@ -333,13 +334,13 @@ class FilterDialog(QDialog):
         layout.addRow(found_group)
 
         # Tilgængelighed
-        avail_group = QGroupBox("Tilgængelighed")
+        avail_group = QGroupBox(tr("filter_avail_group"))
         avail_layout = QHBoxLayout(avail_group)
-        self._avail_cb    = QCheckBox("Tilgængelig")
+        self._avail_cb    = QCheckBox(tr("filter_available"))
         self._avail_cb.setChecked(True)
-        self._unavail_cb  = QCheckBox("Midl. utilgængelig")
+        self._unavail_cb  = QCheckBox(tr("filter_unavailable"))
         self._unavail_cb.setChecked(True)
-        self._archived_cb = QCheckBox("Arkiveret")
+        self._archived_cb = QCheckBox(tr("quick_archived"))
         self._archived_cb.setChecked(False)
         avail_layout.addWidget(self._avail_cb)
         avail_layout.addWidget(self._unavail_cb)
@@ -348,12 +349,12 @@ class FilterDialog(QDialog):
         layout.addRow(avail_group)
 
         # Afstand
-        dist_group = QGroupBox("Afstand fra centerpunkt")
+        dist_group = QGroupBox(tr("filter_distance_group"))
         dist_layout = QHBoxLayout(dist_group)
-        self._dist_enabled = QCheckBox("Aktiver")
+        self._dist_enabled = QCheckBox(tr("filter_enable"))
         self._dist_enabled.toggled.connect(self._on_dist_toggled)
         dist_layout.addWidget(self._dist_enabled)
-        dist_layout.addWidget(QLabel("Max:"))
+        dist_layout.addWidget(QLabel(tr("filter_max")))
         self._dist_max = QDoubleSpinBox()
         self._dist_max.setRange(0.1, 9999.0)
         self._dist_max.setValue(50.0)
@@ -364,11 +365,11 @@ class FilterDialog(QDialog):
         layout.addRow(dist_group)
 
         # Premium
-        prem_group = QGroupBox("Premium")
+        prem_group = QGroupBox(tr("filter_premium_group"))
         prem_layout = QHBoxLayout(prem_group)
-        self._prem_yes = QCheckBox("Kun premium")
+        self._prem_yes = QCheckBox(tr("filter_premium_only"))
         self._prem_yes.setChecked(True)
-        self._prem_no  = QCheckBox("Ikke premium")
+        self._prem_no  = QCheckBox(tr("filter_not_premium"))
         self._prem_no.setChecked(True)
         prem_layout.addWidget(self._prem_yes)
         prem_layout.addWidget(self._prem_no)
@@ -376,11 +377,11 @@ class FilterDialog(QDialog):
         layout.addRow(prem_group)
 
         # Trackables
-        tb_group = QGroupBox("Trackables")
+        tb_group = QGroupBox(tr("filter_trackables_group"))
         tb_layout = QHBoxLayout(tb_group)
-        self._tb_yes = QCheckBox("Har trackables")
+        self._tb_yes = QCheckBox(tr("filter_has_trackables"))
         self._tb_yes.setChecked(True)
-        self._tb_no  = QCheckBox("Ingen trackables")
+        self._tb_no  = QCheckBox(tr("filter_no_trackables"))
         self._tb_no.setChecked(True)
         tb_layout.addWidget(self._tb_yes)
         tb_layout.addWidget(self._tb_no)
@@ -397,10 +398,10 @@ class FilterDialog(QDialog):
         layout.setContentsMargins(10, 10, 10, 10)
 
         # Udlagt dato
-        hidden_group = QGroupBox("Udlagt dato")
+        hidden_group = QGroupBox(tr("filter_hidden_date_group"))
         hidden_layout = QFormLayout(hidden_group)
 
-        self._hidden_from_enabled = QCheckBox("Fra:")
+        self._hidden_from_enabled = QCheckBox(tr("filter_from"))
         self._hidden_from = QDateEdit()
         self._hidden_from.setCalendarPopup(True)
         self._hidden_from.setDate(QDate(2000, 1, 1))
@@ -412,7 +413,7 @@ class FilterDialog(QDialog):
         hidden_row1.addStretch()
         hidden_layout.addRow(hidden_row1)
 
-        self._hidden_to_enabled = QCheckBox("Til:")
+        self._hidden_to_enabled = QCheckBox(tr("filter_to"))
         self._hidden_to = QDateEdit()
         self._hidden_to.setCalendarPopup(True)
         self._hidden_to.setDate(QDate.currentDate())
@@ -427,10 +428,10 @@ class FilterDialog(QDialog):
         layout.addRow(hidden_group)
 
         # Seneste log dato
-        log_group = QGroupBox("Seneste log dato")
+        log_group = QGroupBox(tr("filter_log_date_group"))
         log_layout = QFormLayout(log_group)
 
-        self._log_from_enabled = QCheckBox("Fra:")
+        self._log_from_enabled = QCheckBox(tr("filter_from"))
         self._log_from = QDateEdit()
         self._log_from.setCalendarPopup(True)
         self._log_from.setDate(QDate(2000, 1, 1))
@@ -442,7 +443,7 @@ class FilterDialog(QDialog):
         log_row1.addStretch()
         log_layout.addRow(log_row1)
 
-        self._log_to_enabled = QCheckBox("Til:")
+        self._log_to_enabled = QCheckBox(tr("filter_to"))
         self._log_to = QDateEdit()
         self._log_to.setCalendarPopup(True)
         self._log_to.setDate(QDate.currentDate())
@@ -466,8 +467,8 @@ class FilterDialog(QDialog):
 
         # Mode
         mode_row = QHBoxLayout()
-        mode_row.addWidget(QLabel("Cacher der har:"))
-        self._attr_mode_all = QCheckBox("ALLE valgte attributter")
+        mode_row.addWidget(QLabel(tr("filter_caches_with")))
+        self._attr_mode_all = QCheckBox(tr("filter_all_selected"))
         self._attr_mode_all.setChecked(True)
         mode_row.addWidget(self._attr_mode_all)
         mode_row.addStretch()
@@ -484,7 +485,7 @@ class FilterDialog(QDialog):
         grid.setContentsMargins(6, 6, 6, 6)
 
         # Header
-        for col, txt in enumerate(["Attribut", "Ja", "Nej", "Ingen"]):
+        for col, txt in enumerate([tr("filter_attr_col_name"), tr("filter_yes"), tr("filter_no"), tr("filter_none_short")]):
             lbl = QLabel(f"<b>{txt}</b>")
             lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             grid.addWidget(lbl, 0, col)
@@ -740,7 +741,7 @@ class FilterDialog(QDialog):
 
     def _load_profiles_into_combo(self) -> None:
         self._profile_combo.clear()
-        self._profile_combo.addItem("(Intet)", None)
+        self._profile_combo.addItem(tr("filter_none"), None)
         for path in FilterProfile.list_profiles():
             try:
                 p = FilterProfile.load(path)
@@ -757,11 +758,11 @@ class FilterDialog(QDialog):
             self._reset_all()
             self._load_filterset(profile.filterset)
         except Exception as e:
-            QMessageBox.warning(self, "Fejl", f"Kunne ikke indlæse profil:\n{e}")
+            QMessageBox.warning(self, tr("error"), tr("filter_load_error", error=e))
 
     def _save_profile(self) -> None:
         name, ok = QInputDialog.getText(
-            self, "Gem filter", "Navn på filter profil:"
+            self, tr("filter_save_title"), tr("filter_profile_name_label")
         )
         if not ok or not name.strip():
             return
@@ -774,7 +775,7 @@ class FilterDialog(QDialog):
             if self._profile_combo.itemText(i) == name.strip():
                 self._profile_combo.setCurrentIndex(i)
                 break
-        QMessageBox.information(self, "Gemt", f"Filter '{name}' er gemt.")
+        QMessageBox.information(self, tr("filter_saved_title"), tr("filter_saved_msg", name=name))
 
     def _delete_profile(self) -> None:
         path = self._profile_combo.currentData()
@@ -782,8 +783,8 @@ class FilterDialog(QDialog):
             return
         name = self._profile_combo.currentText()
         reply = QMessageBox.question(
-            self, "Slet profil",
-            f"Slet filterprofilen '{name}'?",
+            self, tr("filter_delete_title"),
+            tr("filter_delete_msg", name=name),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply == QMessageBox.StandardButton.Yes:

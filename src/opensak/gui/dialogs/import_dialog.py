@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from opensak.gui.settings import get_settings
+from opensak.lang import tr
 
 
 class ImportWorker(QThread):
@@ -51,7 +52,7 @@ class ImportDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Importer GPX / Pocket Query")
+        self.setWindowTitle(tr("import_dialog_title"))
         self.setMinimumWidth(500)
         self._worker: ImportWorker | None = None
         self._selected_path: Path | None = None
@@ -62,15 +63,15 @@ class ImportDialog(QDialog):
         layout.setSpacing(10)
 
         # ── File selection ────────────────────────────────────────────────────
-        file_lbl = QLabel("Vælg en GPX fil eller Pocket Query ZIP fil:")
+        file_lbl = QLabel(tr("import_select_file_label"))
         layout.addWidget(file_lbl)
 
         file_row = QHBoxLayout()
-        self._path_lbl = QLabel("(ingen fil valgt)")
+        self._path_lbl = QLabel(tr("import_no_file"))
         self._path_lbl.setStyleSheet("color: gray;")
         file_row.addWidget(self._path_lbl, stretch=1)
 
-        self._browse_btn = QPushButton("Vælg fil…")
+        self._browse_btn = QPushButton(tr("import_browse"))
         self._browse_btn.clicked.connect(self._browse)
         file_row.addWidget(self._browse_btn)
         layout.addLayout(file_row)
@@ -85,17 +86,17 @@ class ImportDialog(QDialog):
         self._log = QTextEdit()
         self._log.setReadOnly(True)
         self._log.setMaximumHeight(180)
-        self._log.setPlaceholderText("Importresultat vises her…")
+        self._log.setPlaceholderText(tr("import_log_placeholder"))
         layout.addWidget(self._log)
 
         # ── Buttons ───────────────────────────────────────────────────────────
         btn_row = QHBoxLayout()
-        self._import_btn = QPushButton("Importer")
+        self._import_btn = QPushButton(tr("import_start"))
         self._import_btn.setEnabled(False)
         self._import_btn.clicked.connect(self._start_import)
         btn_row.addWidget(self._import_btn)
 
-        self._close_btn = QPushButton("Luk")
+        self._close_btn = QPushButton(tr("close"))
         self._close_btn.clicked.connect(self.accept)
         btn_row.addWidget(self._close_btn)
         layout.addLayout(btn_row)
@@ -104,9 +105,9 @@ class ImportDialog(QDialog):
         settings = get_settings()
         path, _ = QFileDialog.getOpenFileName(
             self,
-            "Vælg GPX eller ZIP fil",
+            tr("import_browse_title"),
             settings.last_import_dir,
-            "Geocaching filer (*.gpx *.zip);;GPX filer (*.gpx);;ZIP filer (*.zip)"
+            tr("import_file_filter")
         )
         if path:
             self._selected_path = Path(path)
@@ -122,7 +123,7 @@ class ImportDialog(QDialog):
         self._import_btn.setEnabled(False)
         self._browse_btn.setEnabled(False)
         self._progress.setVisible(True)
-        self._log.setPlainText(f"Importerer {self._selected_path.name}…")
+        self._log.setPlainText(tr("import_running_file", name=self._selected_path.name))
 
         self._worker = ImportWorker(self._selected_path)
         self._worker.finished.connect(self._on_finished)
@@ -147,7 +148,7 @@ class ImportDialog(QDialog):
                 lines.append(f"    - {e}")
 
         self._log.setPlainText("\n".join(lines))
-        self._import_btn.setText("Importer igen")
+        self._import_btn.setText(tr("import_again"))
         self._import_btn.setEnabled(True)
 
         if result.created > 0 or result.updated > 0:
