@@ -557,8 +557,9 @@ class MainWindow(QMainWindow):
         dlg.exec()
 
     def _show_about(self) -> None:
+        from opensak import __version__
         QMessageBox.about(
             self,
             tr("about_title"),
-            tr("about_text"),
+            tr("about_text", version=__version__),
         )

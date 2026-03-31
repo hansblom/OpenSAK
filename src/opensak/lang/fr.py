@@ -55,7 +55,7 @@ STRINGS: dict[str, str] = {
 
     # File menu
     "action_db_manager":            "&Gérer les bases de données…",
-    "action_import":                "&Importer GPX / zip de PQ…",
+    "action_import":                "&Importer GPX / PQ zip…",
     "action_quit":                  "&Quitter",
 
     # Waypoint menu
@@ -101,7 +101,7 @@ STRINGS: dict[str, str] = {
     "wp_delete_msg":                "Êtes-vous sûr de vouloir supprimer :\n{gc_code} — {name}?",
 
     # ── Import dialog ─────────────────────────────────────────────────────────
-    "import_dialog_title":          "Importer GPX / Zip de PQ",
+    "import_dialog_title":          "Importer GPX / PQ Zip",
     "import_drop_hint":             "Déposer un GPX ou un fichier ZIP ici",
     "import_browse":                "Parcourir…",
     "import_start":                 "Démarrer l'import",
@@ -188,7 +188,7 @@ STRINGS: dict[str, str] = {
     # ── About dialog ──────────────────────────────────────────────────────────
     "about_title":                  "À propos d'OpenSAK",
     "about_text":
-        "<h3>OpenSAK 1.1.0</h3>"
+        "<h3>OpenSAK {version}</h3>"
         "<p>Un outil open source de gestion de géocaching "
         "pour Linux et Windows.</p>"
         "<p>Développé avec Python et PySide6.</p>"
@@ -310,7 +310,7 @@ STRINGS: dict[str, str] = {
     "filter_attr_col_name":         "Attribut",
     "filter_yes":                   "Oui",
     "filter_no":                    "Non",
-    "filter_none_short":            "Tous",
+    "filter_none_short":            "N'importe lequel",
     "filter_save_title":            "Enregistrer le filtre",
     "filter_profile_name_label":    "Nom du profil de filtre:",
     "filter_saved_title":           "Enregistré",
@@ -376,5 +376,42 @@ STRINGS: dict[str, str] = {
     "ctx_copy_coords":      "📋  Copier les coordonnées",
     "ctx_mark_found":       "☑  Marquer comme trouvée",
     "ctx_mark_not_found":   "☐  Marquer comme non trouvée",
+
+    # ── Waypoint dialog — libellés et espaces réservés ────────────────────────
+    "wp_label_gc_code":             "Code GC *:",
+    "wp_label_name":                "Nom *:",
+    "wp_label_type":                "Type *:",
+    "wp_label_container":           "Conteneur:",
+    "wp_label_coords":              "Coordonnées",
+    "wp_label_lat":                 "Latitude *:",
+    "wp_label_lon":                 "Longitude *:",
+    "wp_label_dt":                  "D / T:",
+    "wp_label_difficulty":          "Difficulté:",
+    "wp_label_terrain":             "Terrain:",
+    "wp_label_placed_by":           "Placée par:",
+    "wp_label_country":             "Pays:",
+    "wp_label_state":               "Région/état:",
+    "wp_label_short_desc":          "Desc. courte:",
+    "wp_label_long_desc":           "Desc. longue:",
+    "wp_label_hint":                "Indice:",
+    "wp_label_status":              "Statut:",
+    "wp_label_personal":            "Personnel:",
+    "wp_ph_gc_code":                "ex. GC12345",
+    "wp_ph_name":                   "Nom de la cache",
+    "wp_ph_placed_by":              "Nom d'utilisateur du propriétaire",
+    "wp_ph_country":                "ex. France",
+    "wp_ph_state":                  "ex. Provence",
+    "wp_ph_short_desc":             "Description courte...",
+    "wp_ph_long_desc":              "Description longue...",
+    "wp_ph_hint":                   "Indice de la cache",
+    "wp_cb_available":              "Disponible",
+    "wp_cb_archived":               "Archivée",
+    "wp_cb_premium":                "Membres premium uniquement",
+    "wp_cb_found":                  "Trouvée par moi",
+    "wp_cb_dnf":                    "DNF (Did Not Find)",
+    "wp_cb_favorite":               "Favori ★",
+
+    # ── Fenêtre de filtre — espace réservé du code GC ─────────────────────────
+    "filter_gc_placeholder":        "ex. GC123",
 
 }

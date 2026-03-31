@@ -108,6 +108,7 @@ class GpsExportDialog(QDialog):
         dest_layout.addLayout(device_row)
 
         self._device_info = QLabel("")
+        self._device_info.setWordWrap(True)
         self._device_info.setStyleSheet("color: gray; font-size: 10px;")
         dest_layout.addWidget(self._device_info)
 

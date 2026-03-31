@@ -169,7 +169,7 @@ class FilterDialog(QDialog):
     def __init__(self, parent=None, current_filterset: Optional[FilterSet] = None):
         super().__init__(parent)
         self.setWindowTitle(tr("filter_dialog_title"))
-        self.setMinimumSize(620, 640)
+        self.setMinimumSize(620, 740)
         self._attr_boxes: dict[int, TriStateBox] = {}
         self._setup_ui()
         if current_filterset:
@@ -250,7 +250,7 @@ class FilterDialog(QDialog):
 
         # GC kode
         self._gc_filter = QLineEdit()
-        self._gc_filter.setPlaceholderText("f.eks. GC123")
+        self._gc_filter.setPlaceholderText(tr("filter_gc_placeholder"))
         layout.addRow(tr("filter_gc_label"), self._gc_filter)
 
         # Udlagt af

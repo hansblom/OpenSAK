@@ -188,7 +188,7 @@ STRINGS: dict[str, str] = {
     # ── Om dialog ─────────────────────────────────────────────────────────────
     "about_title":                  "Om OpenSAK",
     "about_text":
-        "<h3>OpenSAK 0.1.0</h3>"
+        "<h3>OpenSAK {version}</h3>"
         "<p>Et open source geocaching-styringsværktøj "
         "til Linux og Windows.</p>"
         "<p>Bygget med Python og PySide6.</p>"
@@ -376,5 +376,42 @@ STRINGS: dict[str, str] = {
     "ctx_copy_coords":      "📋  Kopiér koordinater",
     "ctx_mark_found":       "☑  Marker som fundet",
     "ctx_mark_not_found":   "☐  Marker som ikke fundet",
+
+    # ── Waypoint dialog — feltnavne og placeholders ───────────────────────────
+    "wp_label_gc_code":             "GC Kode *:",
+    "wp_label_name":                "Navn *:",
+    "wp_label_type":                "Type *:",
+    "wp_label_container":           "Container:",
+    "wp_label_coords":              "Koordinater",
+    "wp_label_lat":                 "Breddegrad *:",
+    "wp_label_lon":                 "Længdegrad *:",
+    "wp_label_dt":                  "D / T:",
+    "wp_label_difficulty":          "Sværhedsgrad:",
+    "wp_label_terrain":             "Terræn:",
+    "wp_label_placed_by":           "Udlagt af:",
+    "wp_label_country":             "Land:",
+    "wp_label_state":               "Region/stat:",
+    "wp_label_short_desc":          "Kort beskr.:",
+    "wp_label_long_desc":           "Lang beskr.:",
+    "wp_label_hint":                "Hint:",
+    "wp_label_status":              "Status:",
+    "wp_label_personal":            "Personligt:",
+    "wp_ph_gc_code":                "f.eks. GC12345",
+    "wp_ph_name":                   "Navn på cachen",
+    "wp_ph_placed_by":              "Udlæggerens brugernavn",
+    "wp_ph_country":                "f.eks. Denmark",
+    "wp_ph_state":                  "f.eks. Zealand",
+    "wp_ph_short_desc":             "Kort beskrivelse...",
+    "wp_ph_long_desc":              "Lang beskrivelse...",
+    "wp_ph_hint":                   "Hint til cachen",
+    "wp_cb_available":              "Tilgængelig",
+    "wp_cb_archived":               "Arkiveret",
+    "wp_cb_premium":                "Kun premium medlemmer",
+    "wp_cb_found":                  "Fundet af mig",
+    "wp_cb_dnf":                    "DNF (Did Not Find)",
+    "wp_cb_favorite":               "Favorit ★",
+
+    # ── Filter dialog — GC kode placeholder ──────────────────────────────────
+    "filter_gc_placeholder":        "f.eks. GC123",
 
 }

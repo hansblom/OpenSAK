@@ -71,39 +71,39 @@ class WaypointDialog(QDialog):
         basic_layout.setSpacing(8)
 
         self._gc_code = QLineEdit()
-        self._gc_code.setPlaceholderText("f.eks. GC12345")
+        self._gc_code.setPlaceholderText(tr("wp_ph_gc_code"))
         if self._is_edit:
             self._gc_code.setReadOnly(True)
             self._gc_code.setStyleSheet("color: gray;")
-        basic_layout.addRow("GC Kode *:", self._gc_code)
+        basic_layout.addRow(tr("wp_label_gc_code"), self._gc_code)
 
         self._name = QLineEdit()
-        self._name.setPlaceholderText("Navn på cachen")
-        basic_layout.addRow("Navn *:", self._name)
+        self._name.setPlaceholderText(tr("wp_ph_name"))
+        basic_layout.addRow(tr("wp_label_name"), self._name)
 
         self._cache_type = QComboBox()
         self._cache_type.addItems(CACHE_TYPES)
-        basic_layout.addRow("Type *:", self._cache_type)
+        basic_layout.addRow(tr("wp_label_type"), self._cache_type)
 
         self._container = QComboBox()
         self._container.addItems(CONTAINER_SIZES)
-        basic_layout.addRow("Container:", self._container)
+        basic_layout.addRow(tr("wp_label_container"), self._container)
 
         # Koordinater
-        coord_group = QGroupBox("Koordinater")
+        coord_group = QGroupBox(tr("wp_label_coords"))
         coord_layout = QFormLayout(coord_group)
 
         self._lat = QDoubleSpinBox()
         self._lat.setRange(-90.0, 90.0)
         self._lat.setDecimals(6)
         self._lat.setSingleStep(0.0001)
-        coord_layout.addRow("Breddegrad *:", self._lat)
+        coord_layout.addRow(tr("wp_label_lat"), self._lat)
 
         self._lon = QDoubleSpinBox()
         self._lon.setRange(-180.0, 180.0)
         self._lon.setDecimals(6)
         self._lon.setSingleStep(0.0001)
-        coord_layout.addRow("Længdegrad *:", self._lon)
+        coord_layout.addRow(tr("wp_label_lon"), self._lon)
 
         basic_layout.addRow(coord_group)
 
@@ -114,7 +114,7 @@ class WaypointDialog(QDialog):
         self._difficulty.setSingleStep(0.5)
         self._difficulty.setDecimals(1)
         self._difficulty.setValue(1.5)
-        dt_layout.addWidget(QLabel("Sværhedsgrad:"))
+        dt_layout.addWidget(QLabel(tr("wp_label_difficulty")))
         dt_layout.addWidget(self._difficulty)
         dt_layout.addSpacing(16)
 
@@ -123,10 +123,10 @@ class WaypointDialog(QDialog):
         self._terrain.setSingleStep(0.5)
         self._terrain.setDecimals(1)
         self._terrain.setValue(1.5)
-        dt_layout.addWidget(QLabel("Terræn:"))
+        dt_layout.addWidget(QLabel(tr("wp_label_terrain")))
         dt_layout.addWidget(self._terrain)
         dt_layout.addStretch()
-        basic_layout.addRow("D / T:", dt_layout)
+        basic_layout.addRow(tr("wp_label_dt"), dt_layout)
 
         tabs.addTab(basic, tr("wp_tab_basic"))
 
@@ -136,30 +136,30 @@ class WaypointDialog(QDialog):
         details_layout.setSpacing(8)
 
         self._placed_by = QLineEdit()
-        self._placed_by.setPlaceholderText("Udlæggerens brugernavn")
-        details_layout.addRow("Udlagt af:", self._placed_by)
+        self._placed_by.setPlaceholderText(tr("wp_ph_placed_by"))
+        details_layout.addRow(tr("wp_label_placed_by"), self._placed_by)
 
         self._country = QLineEdit()
-        self._country.setPlaceholderText("f.eks. Denmark")
-        details_layout.addRow("Land:", self._country)
+        self._country.setPlaceholderText(tr("wp_ph_country"))
+        details_layout.addRow(tr("wp_label_country"), self._country)
 
         self._state = QLineEdit()
-        self._state.setPlaceholderText("f.eks. Zealand")
-        details_layout.addRow("Region/stat:", self._state)
+        self._state.setPlaceholderText(tr("wp_ph_state"))
+        details_layout.addRow(tr("wp_label_state"), self._state)
 
         self._short_desc = QTextEdit()
         self._short_desc.setMaximumHeight(80)
-        self._short_desc.setPlaceholderText("Kort beskrivelse...")
-        details_layout.addRow("Kort beskr.:", self._short_desc)
+        self._short_desc.setPlaceholderText(tr("wp_ph_short_desc"))
+        details_layout.addRow(tr("wp_label_short_desc"), self._short_desc)
 
         self._long_desc = QTextEdit()
         self._long_desc.setMaximumHeight(120)
-        self._long_desc.setPlaceholderText("Lang beskrivelse...")
-        details_layout.addRow("Lang beskr.:", self._long_desc)
+        self._long_desc.setPlaceholderText(tr("wp_ph_long_desc"))
+        details_layout.addRow(tr("wp_label_long_desc"), self._long_desc)
 
         self._hints = QLineEdit()
-        self._hints.setPlaceholderText("Hint til cachen")
-        details_layout.addRow("Hint:", self._hints)
+        self._hints.setPlaceholderText(tr("wp_ph_hint"))
+        details_layout.addRow(tr("wp_label_hint"), self._hints)
 
         tabs.addTab(details, tr("wp_tab_details"))
 
@@ -168,23 +168,23 @@ class WaypointDialog(QDialog):
         status_layout = QFormLayout(status)
         status_layout.setSpacing(8)
 
-        self._available = QCheckBox("Tilgængelig")
+        self._available = QCheckBox(tr("wp_cb_available"))
         self._available.setChecked(True)
-        status_layout.addRow("Status:", self._available)
+        status_layout.addRow(tr("wp_label_status"), self._available)
 
-        self._archived = QCheckBox("Arkiveret")
+        self._archived = QCheckBox(tr("wp_cb_archived"))
         status_layout.addRow("", self._archived)
 
-        self._premium = QCheckBox("Kun premium medlemmer")
+        self._premium = QCheckBox(tr("wp_cb_premium"))
         status_layout.addRow("", self._premium)
 
-        self._found = QCheckBox("Fundet af mig")
-        status_layout.addRow("Personligt:", self._found)
+        self._found = QCheckBox(tr("wp_cb_found"))
+        status_layout.addRow(tr("wp_label_personal"), self._found)
 
-        self._dnf = QCheckBox("DNF (Did Not Find)")
+        self._dnf = QCheckBox(tr("wp_cb_dnf"))
         status_layout.addRow("", self._dnf)
 
-        self._favorite = QCheckBox("Favorit ★")
+        self._favorite = QCheckBox(tr("wp_cb_favorite"))
         status_layout.addRow("", self._favorite)
 
         tabs.addTab(status, tr("wp_tab_status"))
@@ -196,6 +196,8 @@ class WaypointDialog(QDialog):
             QDialogButtonBox.StandardButton.Save |
             QDialogButtonBox.StandardButton.Cancel
         )
+        buttons.button(QDialogButtonBox.StandardButton.Save).setText(tr("save"))
+        buttons.button(QDialogButtonBox.StandardButton.Cancel).setText(tr("cancel"))
         buttons.accepted.connect(self._validate_and_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)

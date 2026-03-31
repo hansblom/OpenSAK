@@ -188,7 +188,7 @@ STRINGS: dict[str, str] = {
     # ── About dialog ──────────────────────────────────────────────────────────
     "about_title":                  "About OpenSAK",
     "about_text":
-        "<h3>OpenSAK 0.1.0</h3>"
+        "<h3>OpenSAK {version}</h3>"
         "<p>An open source geocaching management tool "
         "for Linux and Windows.</p>"
         "<p>Built with Python and PySide6.</p>"
@@ -376,5 +376,42 @@ STRINGS: dict[str, str] = {
     "ctx_copy_coords":      "📋  Copy coordinates",
     "ctx_mark_found":       "☑  Mark as found",
     "ctx_mark_not_found":   "☐  Mark as not found",
+
+    # ── Waypoint dialog — field labels and placeholders ───────────────────────
+    "wp_label_gc_code":             "GC Code *:",
+    "wp_label_name":                "Name *:",
+    "wp_label_type":                "Type *:",
+    "wp_label_container":           "Container:",
+    "wp_label_coords":              "Coordinates",
+    "wp_label_lat":                 "Latitude *:",
+    "wp_label_lon":                 "Longitude *:",
+    "wp_label_dt":                  "D / T:",
+    "wp_label_difficulty":          "Difficulty:",
+    "wp_label_terrain":             "Terrain:",
+    "wp_label_placed_by":           "Placed by:",
+    "wp_label_country":             "Country:",
+    "wp_label_state":               "State/region:",
+    "wp_label_short_desc":          "Short desc.:",
+    "wp_label_long_desc":           "Long desc.:",
+    "wp_label_hint":                "Hint:",
+    "wp_label_status":              "Status:",
+    "wp_label_personal":            "Personal:",
+    "wp_ph_gc_code":                "e.g. GC12345",
+    "wp_ph_name":                   "Cache name",
+    "wp_ph_placed_by":              "Owner username",
+    "wp_ph_country":                "e.g. Denmark",
+    "wp_ph_state":                  "e.g. Zealand",
+    "wp_ph_short_desc":             "Short description...",
+    "wp_ph_long_desc":              "Long description...",
+    "wp_ph_hint":                   "Cache hint",
+    "wp_cb_available":              "Available",
+    "wp_cb_archived":               "Archived",
+    "wp_cb_premium":                "Premium members only",
+    "wp_cb_found":                  "Found by me",
+    "wp_cb_dnf":                    "DNF (Did Not Find)",
+    "wp_cb_favorite":               "Favorite ★",
+
+    # ── Filter dialog — GC code placeholder ──────────────────────────────────
+    "filter_gc_placeholder":        "e.g. GC123",
 
 }
