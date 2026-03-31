@@ -8,8 +8,6 @@ on:
   push:
     tags:
       - "v*"
-    branches:
-      - main
   workflow_dispatch:
 
 env:
@@ -184,19 +182,37 @@ jobs:
           body: |
             ## OpenSAK ${{ steps.version.outputs.VERSION }}
 
-            | Platform | Fil | Brug |
-            |----------|-----|------|
-            | Windows  | `OpenSAK-Windows.zip` | Pak ud og dobbeltklik `OpenSAK.exe` |
-            | Linux    | `OpenSAK-Linux-x86_64.AppImage` | `chmod +x` og dobbeltklik |
-            | macOS    | `OpenSAK-macOS.dmg` | Abn og traek til Applications |
+            ### Download
 
-            **Linux:**
+            | Platform | File | How to use |
+            |----------|------|------------|
+            | 🪟 Windows | `OpenSAK-Windows.zip` | Unzip and double-click `OpenSAK.exe` |
+            | 🐧 Linux | `OpenSAK-Linux-x86_64.AppImage` | See instructions below |
+            | 🍎 macOS | `OpenSAK-macOS.dmg` | Open and drag OpenSAK to Applications |
+
+            ### Linux
+
             ```bash
             chmod +x OpenSAK-Linux-x86_64.AppImage
             ./OpenSAK-Linux-x86_64.AppImage
             ```
 
-            Se [CHANGELOG.md](https://github.com/AgreeDK/OpenSAK/blob/main/CHANGELOG.md) for detaljer.
+            Or simply right-click the file → Properties → Allow executing as program, then double-click.
+
+            ### Windows
+
+            1. Download `OpenSAK-Windows.zip`
+            2. Right-click → Extract All
+            3. Open the extracted folder and double-click `OpenSAK.exe`
+
+            ### macOS
+
+            1. Download `OpenSAK-macOS.dmg`
+            2. Open the file and drag OpenSAK to your Applications folder
+            3. First launch: right-click → Open (required because the app is not signed with an Apple certificate)
+
+            ---
+            See [CHANGELOG.md](https://github.com/AgreeDK/OpenSAK/blob/main/CHANGELOG.md) for details.
           files: release-files/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

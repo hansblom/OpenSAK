@@ -1,68 +1,96 @@
-# OpenSAK — Open Source geocaching management tool
+# OpenSAK — Open Source Swiss Army Knife for Geocaching
 
-A cross-platform geocaching management tool for **Linux**, **Windows** and **macOS** — a modern successor to GSAK, built in Python.
+A modern, cross-platform geocaching management tool for **Linux**, **Windows** and **macOS** — a free, open source successor to GSAK, built in Python.
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://www.python.org)
-[![PySide6](https://img.shields.io/badge/GUI-PySide6-green)](https://doc.qt.io/qtforpython/)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Beta-orange)](https://github.com/AgreeDK/opensak)
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![PySide6](https://img.shields.io/badge/GUI-PySide6-green)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Status](https://img.shields.io/badge/Status-Beta-orange)
 
-> ⚠️ **Hobby project disclaimer** — OpenSAK is developed in spare time with no guaranteed update schedule, bug fix timeline, or support commitment. Pull requests and contributions are warmly welcomed!
+---
+
+## ⬇️ Download & Install
+
+> **Latest release: [GitHub Releases page](https://github.com/AgreeDK/OpenSAK/releases/latest)**
+
+| Platform | File | Instructions |
+|----------|------|--------------|
+| 🪟 Windows | `OpenSAK-Windows.zip` | Unzip → double-click `OpenSAK.exe` |
+| 🐧 Linux | `OpenSAK-Linux-x86_64.AppImage` | See below |
+| 🍎 macOS | `OpenSAK-macOS.dmg` | Open → drag to Applications |
+
+**Linux — two ways to run:**
+
+Option 1 — terminal:
+```bash
+chmod +x OpenSAK-Linux-x86_64.AppImage
+./OpenSAK-Linux-x86_64.AppImage
+```
+
+Option 2 — file manager: right-click the file → Properties → tick **Allow executing as program** → double-click.
+
+**macOS note:** On first launch, right-click → Open. This is required because the app is not signed with an Apple Developer certificate.
+
+**Prefer to install from source?** See the [Installation](#installation) section below.
+
+---
+
+> **⚠️ Hobby Project Notice**
+>
+> This project is developed in my spare time as a personal hobby project.
+> Bug reports and suggestions are welcome via GitHub Issues, but responses
+> and updates are not guaranteed. Development happens when time and interest allow.
+>
+> Pull requests are welcome, though they may not always be reviewed or merged.
+>
+> The software is provided as-is, without warranty or guaranteed support.
 
 ---
 
 ## Features
 
 ### Import & Database
+- 📥 **Import** GPX files and Pocket Query ZIP files from Geocaching.com
+- 🗄️ **Multiple databases** — keep regions separate (e.g. Zealand, Bornholm, Cyprus)
+- 📍 **Centre point per database** — distances calculated from your chosen home location
+- ✅ **Update finds** from a reference database (e.g. your "My Finds" PQ)
 
-* 📥 **Import** GPX files and Pocket Query ZIP files from Geocaching.com
-* 🗄️ **Multiple databases** — keep e.g. Zealand, Bornholm and Cyprus separate
-* 📍 **Centre point per database** — distances calculated from your chosen starting point
-* ✅ **Update finds** from a reference database (e.g. "My Finds" PQ)
-
-### Viewing & Navigation
-
-* 🗺️ **Interactive map** with OpenStreetMap and colour-coded cache pins
-* 🔍 **Advanced filter dialog** — 3 tabs: General, Dates and Attributes
-* 📊 **Configurable columns** — 17+ columns can be toggled on/off
-* 🎨 **Status icons** in the list — ✅ found, ❌ DNF, 🔒 archived, ⚠️ unavailable
-* 🔗 **Click GC code** → opens cache page on geocaching.com
-* 🗺️ **Click coordinates** → opens in Google Maps or OpenStreetMap
+### View & Navigation
+- 🗺️ **Interactive map** with OpenStreetMap and colour-coded cache pins with clustering
+- 🔍 **Advanced filter dialog** — 3 tabs: General, Dates and Attributes (~70 Groundspeak attributes)
+- 📊 **Configurable columns** — 17+ columns, toggle on/off
+- 🎨 **Status icons** in list — ✅ found, ❌ DNF, 🔒 archived, ⚠️ unavailable
+- 🔗 **Click GC code** → opens cache page on geocaching.com
+- 🗺️ **Click coordinates** → opens in Google Maps or OpenStreetMap
 
 ### Cache Details
-
-* 📋 **Cache detail panel** — description, hints and logs
-* 🔓 **ROT13 hint decoding** — one click to decode / re-hide
-* 🔍 **Search in logs** — real-time search with match highlighting
-* ✏️ **Add / edit / delete caches** manually (Waypoint CRUD)
-
-### GPS Export
-
-* 📡 **Send to GPS** — export caches directly to a Garmin device via USB
-* 🗑️ **Delete existing GPX files** on device before upload (with confirmation)
-* 💾 **Save as GPX file** — export to any local path
+- 📋 **Cache details** — description, hints and logs
+- 🔓 **ROT13 hint decoding** — one click to decode / re-hide the hint
+- 🔍 **Search in logs** — real-time search with match highlighting
+- ✏️ **Add / edit / delete** caches manually
 
 ### Right-click Menu
+- 🌐 Open on geocaching.com
+- 🗺️ Open in map app (Google Maps / OpenStreetMap)
+- 📋 Copy GC code / coordinates
+- ☑ Mark as found / not found
 
-* 🌐 Open on geocaching.com
-* 🗺️ Open in map app (Google Maps / OpenStreetMap)
-* 📋 Copy GC code / coordinates
-* ☑ Mark as found / not found
+### GPS Export
+- 📤 **Send to Garmin GPS** — auto-detects USB-mounted Garmin devices
+- 🗑️ **Optional: delete existing GPX files** on device before upload
+- 💾 **Save as GPX file** — export to any location
 
 ### Language Support
-
-* 🌍 **Danish and English** built in — easily extensible to other languages
-* 🔄 **Language switcher** in Settings dialog (takes effect on next restart)
+- 🌍 **Danish and English** built in
+- 🔧 **Easy to add new languages** — copy one file, translate, done
 
 ---
 
 ## Known Limitations (Beta)
 
-* Favourite points cannot be imported from GPX/PQ files
-* No Geocaching.com Live API integration (planned)
-* No HTML/PDF report/export function yet (planned)
-* GPS auto-detection may not work on all Linux distros
-* macOS and Windows not yet tested — feedback welcome!
+- Favourite points cannot be imported from GPX/PQ files (requires Geocaching.com API)
+- No Geocaching.com Live API integration
+- macOS and Windows not yet fully tested — feedback welcome!
 
 ---
 
@@ -74,13 +102,65 @@ A cross-platform geocaching management tool for **Linux**, **Windows** and **mac
 | **Windows** | Windows 10 or newer |
 | **macOS** | macOS 11 (Big Sur) or newer |
 | **Python** | 3.10 or newer |
-| **Disk space** | Approx. 500 MB (incl. PySide6) |
+| **Disk space** | ~500 MB (including PySide6) |
 
 ---
 
 ## Installation
 
-### Linux (Ubuntu / Linux Mint / Debian)
+### 🐧 Linux — Automatic installer (recommended)
+
+The easiest way to install OpenSAK on Linux. The script installs all dependencies,
+downloads OpenSAK, and creates a shortcut in your application menu automatically.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AgreeDK/OpenSAK/main/scripts/install-opensak.sh | bash
+```
+
+The installer will:
+- Check and install required system packages (`python3`, `git`, `libxcb-cursor0` etc.)
+- Clone the repository to `~/opensak`
+- Set up a Python virtual environment
+- Create an entry in your application menu
+- Optionally create a desktop shortcut
+- Offer to start OpenSAK immediately when done
+
+> **Manual install:** If you prefer to install manually or the script does not work
+> on your distribution, see the [manual Linux instructions](#linux-manual) below.
+
+---
+
+### 🪟 Windows — Standalone installer (recommended)
+
+> **Note:** A pre-built Windows `.exe` is not yet available. It will appear here once
+> the first release is published. Until then, please use the manual install method below.
+
+When available, download the latest **OpenSAK-Windows.zip** from the
+[Releases page](https://github.com/AgreeDK/OpenSAK/releases), unzip it, and
+double-click `OpenSAK.exe` — no Python or Git installation required.
+
+---
+
+### 🍎 macOS — App bundle (recommended)
+
+> **Note:** A pre-built macOS `.dmg` is not yet available. It will appear here once
+> the first release is published. Until then, please use the manual install method below.
+
+When available, download the latest **OpenSAK-macOS.dmg** from the
+[Releases page](https://github.com/AgreeDK/OpenSAK/releases), open it, and drag
+OpenSAK to your Applications folder.
+
+> On first launch, macOS may block the app because it is not signed with an Apple
+> Developer certificate. Right-click → Open to bypass this warning.
+
+---
+
+### Manual installation (all platforms)
+
+Use this method if the automatic installer does not work, or if you prefer
+to install from source.
+
+#### Linux (manual) <a name="linux-manual"></a>
 
 ```bash
 sudo apt update
@@ -97,13 +177,11 @@ pip install -r requirements.txt
 python run.py
 ```
 
----
+#### Windows (manual)
 
-### Windows
+Install **Python 3.10+** from [python.org](https://www.python.org/downloads/) — make sure to check **"Add Python to PATH"**
 
-**Install Python 3.10+** from [python.org](https://www.python.org/downloads/) — make sure to check **"Add Python to PATH"**
-
-**Install Git** from [git-scm.com](https://git-scm.com/download/win)
+Install **Git** from [git-scm.com](https://git-scm.com/download/win)
 
 ```powershell
 cd $env:USERPROFILE
@@ -115,13 +193,12 @@ pip install -r requirements.txt
 python run.py
 ```
 
----
+#### macOS (manual)
 
-### macOS
-
-> ⚠️ macOS has not been tested yet. Feedback is very welcome!
+> ⚠️ macOS is not yet fully tested. Feedback is very welcome!
 
 ```bash
+xcode-select --install   # if not already installed
 brew install python git
 
 cd ~
@@ -135,36 +212,32 @@ python run.py
 
 ---
 
-## Getting Started — First Use
+## Getting Started
 
 ### 1. Get a Pocket Query from Geocaching.com
-
 1. Log in at [geocaching.com](https://www.geocaching.com)
-2. Go to **Pocket Queries** under your profile menu
+2. Go to **Pocket Queries** in your profile menu
 3. Download a Pocket Query as a `.zip` file
 
 ### 2. Import into OpenSAK
-
 1. Start OpenSAK with `python run.py`
 2. Click **Import GPX / PQ zip** in the menu bar
 3. Select your `.zip` file and click **Import**
 
-### 3. Set your centre point
-
+### 3. Set your home location
 1. Go to **Tools → Settings**
 2. Enter your home coordinates (latitude / longitude)
 3. Choose your preferred map app (Google Maps or OpenStreetMap)
 
 ### 4. Filter and find caches
-
-* **Quick filter** — dropdown at the top of the window
-* **Advanced filter** — click 🔍 **Filter** in the toolbar (Ctrl+F)
-  * General, Dates and ~70 Groundspeak attributes
-  * Save filter profiles for reuse
+- **Quick filter** — dropdown at the top of the window
+- **Advanced filter** — click 🔍 **Filter** in the toolbar (Ctrl+F)
+  - General, Dates and ~70 Groundspeak attributes
+  - Save filter profiles for reuse
 
 ---
 
-## Update Found Caches from "My Finds"
+## Updating Finds from "My Finds"
 
 1. Download your **"My Finds"** Pocket Query from geocaching.com
 2. Create a new database called "My Finds" in OpenSAK
@@ -174,17 +247,47 @@ python run.py
 
 ---
 
-## Send Caches to GPS Device
+## Changing the Language
 
-1. Connect your Garmin GPS via USB
-2. Go to **GPS → Send to GPS** (Ctrl+G)
-3. Click **Scan** to detect the device automatically
-4. Optionally enable **"Delete existing GPX files on device"**
-5. Click **Send**
+1. Go to **Tools → Settings**
+2. Select your language in the **Language** section
+3. Restart OpenSAK — the new language takes effect on next startup
+
+Currently supported: **Danish (da)**, **English (en)**
+
+### Adding a New Language
+1. Copy `src/opensak/lang/en.py` to e.g. `src/opensak/lang/de.py`
+2. Translate the string values (keys must not be changed)
+3. Register the language in `src/opensak/lang/__init__.py`:
+   ```python
+   AVAILABLE_LANGUAGES = {
+       "da": "Dansk",
+       "en": "English",
+       "de": "Deutsch",   # ← add this line
+   }
+   ```
+4. Submit a Pull Request — contributions welcome!
 
 ---
 
-## Update to Latest Version
+## Updating to the Latest Version
+
+### If you used the automatic Linux installer
+
+```bash
+cd ~/opensak
+git pull origin main
+source .venv/bin/activate
+pip install -r requirements.txt
+python run.py
+```
+
+### If you downloaded a release (.exe / .dmg / AppImage)
+
+Download the latest version from the [Releases page](https://github.com/AgreeDK/OpenSAK/releases)
+and replace your existing installation.
+
+### If you installed manually from source
 
 ```bash
 cd ~/opensak
@@ -198,13 +301,12 @@ python run.py
 
 ---
 
-## Report a Bug
+## Reporting Bugs
 
-Use [GitHub Issues](https://github.com/AgreeDK/opensak/issues) and include:
-
-* Your platform (Linux/Windows/macOS + version)
-* Python version: `python3 --version`
-* Error message from the terminal
+Please use [GitHub Issues](https://github.com/AgreeDK/opensak/issues) and include:
+- Your platform (Linux / Windows / macOS + version)
+- Python version: `python3 --version`
+- The error message from the terminal (if any)
 
 ---
 
@@ -212,22 +314,27 @@ Use [GitHub Issues](https://github.com/AgreeDK/opensak/issues) and include:
 
 ```
 opensak/
-├── run.py                              # Start the application from here
+├── run.py                          # Entry point
 ├── requirements.txt
+├── scripts/
+│   └── install-opensak.sh          # Linux automatic installer
 ├── src/opensak/
-│   ├── app.py
-│   ├── config.py
-│   ├── lang/                           # i18n — da.py, en.py, fr.py + __init__.py
+│   ├── app.py                      # Startup + migration
+│   ├── config.py                   # Paths + language preference
+│   ├── lang/                       # Language files
+│   │   ├── __init__.py             # i18n engine (tr() function)
+│   │   ├── da.py                   # Danish
+│   │   └── en.py                   # English
 │   ├── db/
-│   │   ├── models.py
-│   │   ├── database.py
-│   │   ├── manager.py
-│   │   └── found_updater.py
-│   ├── importer/
+│   │   ├── models.py               # SQLAlchemy ORM models
+│   │   ├── database.py             # Session management
+│   │   ├── manager.py              # Multiple databases
+│   │   └── found_updater.py        # Update finds from reference DB
+│   ├── importer/                   # GPX + PQ ZIP importer
 │   ├── filters/
-│   │   └── engine.py                   # 18 filter types with AND/OR logic
+│   │   └── engine.py               # 18 filter types, AND/OR, profiles
 │   ├── gps/
-│   │   └── garmin.py                   # Garmin detection + GPX generator
+│   │   └── garmin.py               # Garmin detection + GPX generator
 │   └── gui/
 │       ├── mainwindow.py
 │       ├── cache_table.py
@@ -235,27 +342,37 @@ opensak/
 │       ├── map_widget.py
 │       ├── settings.py
 │       └── dialogs/
-│           ├── filter_dialog.py        # Advanced filter (3 tabs)
+│           ├── filter_dialog.py    # Advanced filter (3 tabs)
 │           ├── import_dialog.py
 │           ├── waypoint_dialog.py
 │           ├── column_dialog.py
 │           ├── database_dialog.py
 │           ├── found_dialog.py
-│           ├── gps_dialog.py           # GPS export + delete dialog
+│           ├── gps_dialog.py
 │           └── settings_dialog.py
 └── tests/
+    ├── test_db.py                  # 13 tests
+    ├── test_importer.py            # 11 tests
+    └── test_filters.py             # 39 tests
 ```
 
 ---
 
 ## Roadmap
 
-* HTML/PDF reports and statistics
-* Favourite points (requires Geocaching.com API)
-* More languages (German, Swedish, …)
-* Windows installer (.exe)
-* Linux AppImage
-* GitHub Actions CI/CD pipeline
+- [ ] HTML/PDF reports and statistics
+- [ ] GPS export — improve auto-detection on all Linux distros
+- [ ] Favourite points (requires Geocaching.com API)
+- [x] Windows installer (.exe) — built automatically via GitHub Actions
+- [x] Linux AppImage — built automatically via GitHub Actions
+- [x] GitHub Actions CI/CD pipeline
+- [ ] More languages (German, Swedish, …)
+
+---
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
@@ -265,10 +382,10 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-## Thanks to
+## Acknowledgements
 
-* [OpenStreetMap](https://www.openstreetmap.org) for map data
-* [Leaflet.js](https://leafletjs.com) for the map library
-* [PySide6 / Qt](https://www.qt.io) for the GUI framework
-* [SQLAlchemy](https://www.sqlalchemy.org) for the database layer
-* Everyone who has tested and given feedback!
+- [OpenStreetMap](https://www.openstreetmap.org) for map tiles
+- [Leaflet.js](https://leafletjs.com) for the map library
+- [PySide6 / Qt](https://www.qt.io) for the GUI framework
+- [SQLAlchemy](https://www.sqlalchemy.org) for the database layer
+- Everyone who has tested the app and provided feedback!
