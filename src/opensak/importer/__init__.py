@@ -1,9 +1,10 @@
 """
-src/opensak/importer/gpx.py — GPX importer for OpenSAK.
+src/opensak/importer/__init__.py — GPX + LOC importer for OpenSAK.
 
 Supports:
 - Single .gpx files (Groundspeak/Pocket Query format, GPX 1.0)
 - Pocket Query .zip files (main GPX + companion -wpts.gpx file)
+- .loc files (basic geocaching format with coordinates only)
 - Duplicate handling: upserts existing caches by gc_code
 - Windows \r\n line endings handled transparently by lxml
 """
@@ -78,7 +79,7 @@ def _parse_extra_waypoints(tree) -> dict[str, list[dict]]:
         derive it from the numeric prefix + remaining chars.
 
     In practice the companion file does NOT embed the parent GC code directly.
-    The link is: wpt <name> characters from position 2 onward == gc_code chars
+    The link is: wpt <n> characters from position 2 onward == gc_code chars
     from position 2 onward.  E.g. '04BDQBF'[2:] == 'BDQBF', parent == 'GC??BDQBF'
     — but the exact digits differ.
 
@@ -134,7 +135,7 @@ def _parse_wpt(wpt_el) -> Optional[dict]:
     except (TypeError, ValueError):
         return None
 
-    # GC code: <name> in newer PQ files, <n> in older format
+    # GC code: <n> in newer PQ files, <n> in older format
     gc_code = (
         _text(wpt_el, "gpx:name", NS) or
         _text(wpt_el, "gpx:n", NS)
@@ -257,6 +258,63 @@ def _parse_wpt(wpt_el) -> Optional[dict]:
     }
 
 
+# ── LOC parser ────────────────────────────────────────────────────────────────
+
+def _parse_loc_waypoint(wpt_el) -> Optional[dict]:
+    """
+    Parse a single <waypoint> element from a .loc file.
+
+    .loc files only contain GC code, name, and coordinates.
+    All other fields are set to None/defaults.
+    """
+    name_el = wpt_el.find("name")
+    if name_el is None:
+        return None
+
+    gc_code = name_el.get("id", "").strip()
+    if not gc_code.startswith("GC"):
+        return None
+
+    # Cache display name is the CDATA text content of <name>
+    cache_name = name_el.text.strip() if name_el.text else gc_code
+
+    coord_el = wpt_el.find("coord")
+    if coord_el is None:
+        return None
+
+    try:
+        lat = float(coord_el.get("lat"))
+        lon = float(coord_el.get("lon"))
+    except (TypeError, ValueError):
+        return None
+
+    return {
+        "gc_code":           gc_code,
+        "name":              cache_name,
+        "cache_type":        "Traditional Cache",   # .loc has no type info
+        "container":         None,
+        "latitude":          lat,
+        "longitude":         lon,
+        "difficulty":        None,
+        "terrain":           None,
+        "placed_by":         None,
+        "owner_id":          None,
+        "hidden_date":       None,
+        "available":         True,
+        "archived":          False,
+        "country":           None,
+        "state":             None,
+        "short_description": None,
+        "short_desc_html":   False,
+        "long_description":  None,
+        "long_desc_html":    False,
+        "encoded_hints":     None,
+        "attributes":        [],
+        "logs":              [],
+        "trackables":        [],
+    }
+
+
 # ── DB upsert ─────────────────────────────────────────────────────────────────
 
 def _upsert_cache(session: Session, data: dict, source_file: str) -> tuple[Cache, bool]:
@@ -361,7 +419,7 @@ def _link_extra_waypoints(
 # ── Public API ────────────────────────────────────────────────────────────────
 
 class ImportResult:
-    """Summary of a GPX import operation."""
+    """Summary of a GPX/LOC import operation."""
 
     def __init__(self):
         self.created:   int = 0
@@ -369,6 +427,7 @@ class ImportResult:
         self.skipped:   int = 0
         self.waypoints: int = 0
         self.errors:    list[str] = []
+        self.warnings:  list[str] = []
 
     @property
     def total(self) -> int:
@@ -381,6 +440,9 @@ class ImportResult:
             f"  Waypoints added: {self.waypoints}",
             f"  Skipped        : {self.skipped}",
         ]
+        if self.warnings:
+            for w in self.warnings:
+                lines.append(f"  ⚠ {w}")
         if self.errors:
             lines.append(f"  Errors         : {len(self.errors)}")
             for e in self.errors[:5]:
@@ -459,8 +521,8 @@ def import_zip(zip_path: Path, session: Session) -> ImportResult:
     Import a Pocket Query .zip file.
 
     The zip contains:
-      - <name>.gpx          — main cache file
-      - <name>-wpts.gpx     — companion waypoints file (optional)
+      - <n>.gpx          — main cache file
+      - <n>-wpts.gpx     — companion waypoints file (optional)
     """
     result = ImportResult()
 
@@ -487,5 +549,53 @@ def import_zip(zip_path: Path, session: Session) -> ImportResult:
         wpts_path = wpts_files[0] if wpts_files else None
 
         result = import_gpx(gpx_path, session, wpts_path=wpts_path)
+
+    return result
+
+
+def import_loc(loc_path: Path, session: Session) -> ImportResult:
+    """
+    Import a .loc file into the database.
+
+    .loc files only contain GC code, name, and coordinates.
+    A warning is added to the result informing the user about missing data.
+    """
+    result = ImportResult()
+    source = loc_path.name
+
+    result.warnings.append(
+        ".loc filer indeholder kun koordinater og navn — "
+        "importér en GPX fil for at få fuld cacheinformation"
+    )
+
+    try:
+        tree = etree.parse(str(loc_path))
+    except etree.XMLSyntaxError as e:
+        result.errors.append(f"XML parse error i {loc_path.name}: {e}")
+        return result
+
+    root = tree.getroot()
+
+    for wpt_el in root.iter("waypoint"):
+        try:
+            data = _parse_loc_waypoint(wpt_el)
+        except Exception as e:
+            result.errors.append(f"Parse error: {e}")
+            result.skipped += 1
+            continue
+
+        if data is None:
+            result.skipped += 1
+            continue
+
+        try:
+            _, created = _upsert_cache(session, data, source)
+            if created:
+                result.created += 1
+            else:
+                result.updated += 1
+        except Exception as e:
+            result.errors.append(f"DB fejl for {data.get('gc_code', '?')}: {e}")
+            result.skipped += 1
 
     return result
