@@ -49,6 +49,46 @@ def _migrate_legacy_db() -> None:
             print(f"Slettede tom {legacy.name}")
 
 
+def _make_splash(app) -> "QSplashScreen":
+    """Opret og vis en splash screen med OpenSAK navn og loading tekst."""
+    from PySide6.QtWidgets import QSplashScreen
+    from PySide6.QtGui import QPixmap, QPainter, QColor, QFont
+    from PySide6.QtCore import Qt
+
+    # Tegn splash pixmap programmatisk — ingen billedfil nødvendig
+    W, H = 420, 220
+    pix = QPixmap(W, H)
+    pix.fill(QColor("#1e2a3a"))
+
+    painter = QPainter(pix)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+    # Baggrundsgradient-linje i toppen
+    painter.fillRect(0, 0, W, 5, QColor("#4a9eff"))
+
+    # Titel
+    font_title = QFont("Sans Serif", 28, QFont.Weight.Bold)
+    painter.setFont(font_title)
+    painter.setPen(QColor("#ffffff"))
+    painter.drawText(0, 0, W, 100, Qt.AlignmentFlag.AlignCenter, "OpenSAK")
+
+    # Undertitel
+    font_sub = QFont("Sans Serif", 10)
+    painter.setFont(font_sub)
+    painter.setPen(QColor("#7ab8f5"))
+    painter.drawText(0, 85, W, 40, Qt.AlignmentFlag.AlignCenter,
+                     "Open Source Swiss Army Knife")
+
+    # Loading tekst placeholder (opdateres via showMessage)
+    painter.end()
+
+    splash = QSplashScreen(pix, Qt.WindowType.WindowStaysOnTopHint)
+    splash.setFont(QFont("Sans Serif", 9))
+    splash.show()
+    app.processEvents()
+    return splash
+
+
 def main() -> None:
     from PySide6.QtWidgets import QApplication
     from PySide6.QtCore import Qt
@@ -59,23 +99,48 @@ def main() -> None:
     app.setOrganizationName("OpenSAK Project")
     app.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
 
+    # Vis splash screen øjeblikkeligt
+    splash = _make_splash(app)
+
+    def splash_msg(text: str) -> None:
+        from PySide6.QtGui import QColor
+        from PySide6.QtCore import Qt
+        splash.showMessage(
+            text,
+            Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter,
+            QColor("#a0c8ff"),
+        )
+        app.processEvents()
+
     # Indlæs sprog FØR noget UI oprettes
+    splash_msg("Indlæser sprog...")
     from opensak.config import get_language
     from opensak.lang import load_language
     load_language(get_language())
 
     # Migrer gammel database hvis nødvendigt
+    splash_msg("Kontrollerer database...")
     _migrate_legacy_db()
 
     # Initialiser database manager — åbner samme DB som sidst
+    splash_msg("Indlæser database...")
     from opensak.db.manager import get_db_manager
     manager = get_db_manager()
     manager.ensure_active_initialised()
 
+    # Opret hovedvindue
+    splash_msg("Starter OpenSAK...")
     from opensak.gui.mainwindow import MainWindow
     window = MainWindow()
-    window.show()
 
+    # Vent til cache-tabellen er loadet før splash lukkes
+    def _close_splash():
+        splash.finish(window)
+
+    from PySide6.QtCore import QTimer
+    QTimer.singleShot(400, _close_splash)
+
+    window.show()
     sys.exit(app.exec())
 
 

@@ -258,6 +258,173 @@ def _parse_wpt(wpt_el) -> Optional[dict]:
     }
 
 
+# ── Extra waypoint parser (GSAK single-file GPX) ─────────────────────────────
+
+_KNOWN_PREFIXES = {
+    # Groundspeak standard
+    "PK": "Parking Area",
+    "TH": "Trailhead",
+    "S1": "Stage", "S2": "Stage", "S3": "Stage", "S4": "Stage",
+    "S5": "Stage", "S6": "Stage", "S7": "Stage", "S8": "Stage", "S9": "Stage",
+    "FN": "Final Location",
+    "RF": "Reference Point",
+    "WP": "Waypoint",
+    "SB": "Stages of a Multicache",
+    "CM": "Custom",
+    "CP": "Custom",
+    "PP": "Physical Stage",
+    "VX": "Virtual Stage",
+    "QA": "Question to Answer",
+    # GSAK-specifikke og udvidede prefixes
+    "LC": "Listed Coordinates",
+    "LB": "Listed By",
+    "LA": "Listed Area",
+    "PA": "Parking Area",
+    "PG": "Parking",
+    "PT": "Point",
+    "PN": "Point",
+    "PB": "Point",
+    "RP": "Reference Point",
+    "ST": "Stage",
+    "SP": "Stage Point",
+    "AA": "Additional Waypoint",
+    "UL": "Additional Waypoint",
+    "TE": "Additional Waypoint",
+    "FK": "Additional Waypoint",
+    # Øvrige fra brugerfil
+    "BR": "Reference Point",
+    "UA": "Additional Waypoint",
+    "TW": "Additional Waypoint",
+    "TU": "Additional Waypoint",
+    "TO": "Additional Waypoint",
+    "SX": "Stage",
+    "SS": "Stage",
+    "SM": "Stage",
+    "SH": "Stage",
+    "SE": "Stage",
+}
+
+# Single-bogstavs prefixes (GSAK bruger T + suffix, V + suffix osv.)
+_KNOWN_SINGLE_PREFIXES = {
+    "T": "Trailhead",
+    "V": "Virtual Stage",
+    "P": "Parking Area",
+    "S": "Stage",
+    "F": "Final Location",
+    "R": "Reference Point",
+}
+
+
+def _parse_extra_wpt(wpt_el) -> Optional[dict]:
+    """Parse a non-GC <wpt> as an extra waypoint (parking, stage, etc.)."""
+    try:
+        lat = float(wpt_el.get("lat"))
+        lon = float(wpt_el.get("lon"))
+    except (TypeError, ValueError):
+        return None
+
+    raw_name = (
+        _text(wpt_el, "gpx:name", NS) or
+        _text(wpt_el, "gpx:n",    NS) or ""
+    )
+    if len(raw_name) < 2:
+        return None
+
+    # Forsøg 2-bogstavs prefix først, derefter 1-bogstavs med tal (P0, P1, 01, 02 osv.)
+    if len(raw_name) >= 3 and raw_name[:2].upper() in _KNOWN_PREFIXES:
+        # Kendt 2-bogstavs prefix: PK, FN, TH osv.
+        prefix = raw_name[:2].upper()
+        suffix = raw_name[2:]
+        wp_type_fallback = _KNOWN_PREFIXES[prefix]
+    elif raw_name[0].upper() in _KNOWN_SINGLE_PREFIXES and len(raw_name) >= 2:
+        # Single bogstav + suffix: T27A2JF, V363R36 osv.
+        # Men kun hvis andet tegn ikke er et tal (P0, P1 håndteres nedenfor)
+        if not raw_name[1].isdigit():
+            prefix = raw_name[0].upper()
+            suffix = raw_name[1:]
+            wp_type_fallback = _KNOWN_SINGLE_PREFIXES[prefix]
+        else:
+            # Bogstav + tal prefix: P0, P1, P2, T0, T1, R0, R1 osv.
+            # Brug type-feltet til at bestemme wp_type
+            prefix = raw_name[:2].upper()
+            suffix = raw_name[2:]
+            # Map første bogstav til type via single-prefix map
+            wp_type_fallback = _KNOWN_SINGLE_PREFIXES.get(raw_name[0].upper(), "Waypoint")
+    elif raw_name[:2].isdigit() and len(raw_name) >= 3:
+        # Rent numerisk prefix: 01, 02, 03 osv. — brug type-feltet
+        prefix = raw_name[:2]
+        suffix = raw_name[2:]
+        wp_type_fallback = "Waypoint"
+    else:
+        return None
+
+    type_raw = _text(wpt_el, "gpx:type", NS) or ""
+    if "|" in type_raw:
+        wp_type = type_raw.split("|")[-1].strip()
+    elif type_raw:
+        wp_type = type_raw
+    else:
+        wp_type = wp_type_fallback
+
+    desc    = _text(wpt_el, "gpx:desc",    NS)
+    comment = _text(wpt_el, "gpx:cmt",     NS)
+    name    = _text(wpt_el, "gpx:urlname", NS) or desc or raw_name
+
+    return {
+        "prefix":      prefix,
+        "suffix":      suffix,
+        "wp_type":     wp_type,
+        "name":        name,
+        "description": desc,
+        "comment":     comment,
+        "latitude":    lat,
+        "longitude":   lon,
+    }
+
+
+def _insert_extra_wpts(session: Session, extra_wpts: list) -> int:
+    """Insert/update extra waypoints by matching suffix to parent cache gc_code."""
+    suffixes = {wp["suffix"] for wp in extra_wpts}
+    count = 0
+
+    for suffix in suffixes:
+        cache = (
+            session.query(Cache)
+            .filter(Cache.gc_code.like(f"%{suffix}"))
+            .first()
+        )
+        if cache is None:
+            continue
+
+        for wp in (w for w in extra_wpts if w["suffix"] == suffix):
+            existing = (
+                session.query(Waypoint)
+                .filter_by(cache_id=cache.id, prefix=wp["prefix"])
+                .first()
+            )
+            if existing:
+                existing.wp_type     = wp["wp_type"]
+                existing.name        = wp["name"]
+                existing.description = wp["description"]
+                existing.comment     = wp["comment"]
+                existing.latitude    = wp["latitude"]
+                existing.longitude   = wp["longitude"]
+            else:
+                session.add(Waypoint(
+                    cache=cache,
+                    prefix=wp["prefix"],
+                    wp_type=wp["wp_type"],
+                    name=wp["name"],
+                    description=wp["description"],
+                    comment=wp["comment"],
+                    latitude=wp["latitude"],
+                    longitude=wp["longitude"],
+                ))
+            count += 1
+
+    return count
+
+
 # ── LOC parser ────────────────────────────────────────────────────────────────
 
 def _parse_loc_waypoint(wpt_el) -> Optional[dict]:
@@ -359,10 +526,19 @@ def _upsert_cache(session: Session, data: dict, source_file: str) -> tuple[Cache
         ))
 
     # Logs
-    for lg in data.get("logs", []):
+    # GSAK bruger dummy log_id '-2' for autogenererede noter (Certitude m.fl.).
+    # Disse er ikke unikke på tværs af caches, så vi genererer et unikt ID
+    # baseret på cache GC-kode + log indeks når log_id er en kendt dummy-værdi.
+    DUMMY_LOG_IDS = {"-2", "0", None, ""}
+    for idx, lg in enumerate(data.get("logs", [])):
+        raw_id = lg["log_id"]
+        if raw_id in DUMMY_LOG_IDS:
+            log_id = f"gen_{data['gc_code']}_{idx}"
+        else:
+            log_id = raw_id
         session.add(Log(
             cache=cache,
-            log_id=lg["log_id"],
+            log_id=log_id,
             log_type=lg["log_type"],
             log_date=lg["log_date"],
             finder=lg["finder"],
@@ -479,6 +655,8 @@ def import_gpx(
     ns_uri = root.nsmap.get(None, "http://www.topografix.com/GPX/1/0")
     wpt_tag = f"{{{ns_uri}}}wpt"
 
+    extra_wpts: list = []
+
     for wpt_el in root.iter(wpt_tag):
         try:
             data = _parse_wpt(wpt_el)
@@ -488,7 +666,15 @@ def import_gpx(
             continue
 
         if data is None:
-            result.skipped += 1
+            # Try as extra waypoint (parking, stage, etc.)
+            try:
+                extra = _parse_extra_wpt(wpt_el)
+                if extra is not None:
+                    extra_wpts.append(extra)
+                else:
+                    result.skipped += 1
+            except Exception:
+                result.skipped += 1
             continue
 
         try:
@@ -503,6 +689,10 @@ def import_gpx(
 
     # Flush so child records get cache_id before waypoint linking
     session.flush()
+
+    # Link collected extra waypoints to their parent caches
+    if extra_wpts:
+        result.waypoints += _insert_extra_wpts(session, extra_wpts)
 
     # Parse and link companion waypoints file
     if wpts_path and wpts_path.exists():
