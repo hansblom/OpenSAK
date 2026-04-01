@@ -437,20 +437,20 @@ STRINGS: dict[str, str] = {
 
     # ── Projection de coordonnées ─────────────────────────────────────────────
     "proj_title":                   "Projection de coordonnées",
-    "proj_start_group":             "Coordonnée de départ",
-    "proj_start_hint":              "Entrez la coordonnée de départ au format DMM, DMS ou DD",
+    "proj_start_group":             "Coordonnées de départ",
+    "proj_start_hint":              "Entrez les coordonnées de départ au format DMM, DMS ou DD",
     "proj_start_placeholder":       "ex. N55 47.250 E012 25.000",
     "proj_params_group":            "Cap et distance",
     "proj_bearing_label":           "Cap (azimut):",
     "proj_distance_label":          "Distance:",
     "proj_unit_m":                  "mètres",
     "proj_unit_ft":                 "pieds",
-    "proj_result_group":            "Coordonnée projetée",
+    "proj_result_group":            "Coordonnées projetées",
 
     # ── Calculateur de somme de chiffres ──────────────────────────────────────
     "chk_title":                    "Somme des chiffres",
-    "chk_input_group":              "Coordonnée",
-    "chk_input_hint":               "Saisissez ou collez une coordonnée — tous les chiffres sont additionnés automatiquement",
+    "chk_input_group":              "Coordonnées",
+    "chk_input_hint":               "Saisissez ou collez des coordonnées — tous les chiffres sont additionnés automatiquement",
     "chk_input_placeholder":        "ex. N55 47.250 E012 25.000",
     "chk_result_group":             "Résultats",
     "chk_total_label":              "Somme totale:",
@@ -460,15 +460,15 @@ STRINGS: dict[str, str] = {
 
     # ── Calculateur de point médian ───────────────────────────────────────────
     "mid_title":                    "Point médian",
-    "mid_point_a":                  "Coordonnée A",
-    "mid_point_b":                  "Coordonnée B",
+    "mid_point_a":                  "Coordonnées A",
+    "mid_point_b":                  "Coordonnées B",
     "mid_placeholder":              "ex. N55 47.250 E012 25.000",
     "mid_result_group":             "Point médian",
 
     # ── Distance & cap ────────────────────────────────────────────────────────
     "dist_title":                   "Distance & Cap",
-    "dist_point_a":                 "Coordonnée A (de)",
-    "dist_point_b":                 "Coordonnée B (vers)",
+    "dist_point_a":                 "Coordonnées A (de)",
+    "dist_point_b":                 "Coordonnées B (vers)",
     "dist_placeholder":             "ex. N55 47.250 E012 25.000",
     "dist_result_group":            "Résultats",
     "dist_distance_label":          "Distance:",

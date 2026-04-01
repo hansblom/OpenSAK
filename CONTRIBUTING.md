@@ -52,9 +52,11 @@ python run.py                      # start the application
 
 ---
 
-## Adding a Translation
+## Adding or Updating a Translation
 
-Want to translate OpenSAK into a new language? It only takes one file:
+Want to translate OpenSAK into a new language, or update an existing one? It only takes one file.
+
+**Creating a new language file:**
 
 1. Copy `src/opensak/lang/en.py` to e.g. `src/opensak/lang/de.py`
 2. Translate the string values on the right-hand side — **do not change the keys**
@@ -67,9 +69,60 @@ Want to translate OpenSAK into a new language? It only takes one file:
    }
    ```
 4. Test by selecting the new language in **Tools → Settings** and restarting
-5. Open a Pull Request — all translations are warmly welcomed!
+5. Submit your translation — see below for how
 
 The language files contain around 220 strings. A rough machine translation that a native speaker then reviews is a perfectly good starting point.
+
+---
+
+### Submitting a translation — two options
+
+#### Option A — Email (simplest, always works)
+
+Just email your updated language file to the maintainer. This is perfectly fine and just as welcome as a GitHub contribution. No GitHub knowledge required.
+
+#### Option B — Fork & Pull Request
+
+This is the standard open source workflow and gives you credit on GitHub.
+
+**Why you get a 403 error if you try to push directly:**
+The repository belongs to the maintainer — nobody else has write access. The correct approach is to fork the repository first (make your own copy on GitHub), push your changes there, and then open a Pull Request.
+
+**Step by step:**
+
+1. Go to https://github.com/AgreeDK/opensak and click **Fork** (top-right corner). GitHub creates a copy at `https://github.com/YOUR_USERNAME/opensak`.
+
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/opensak.git
+   cd opensak
+   ```
+
+3. (Optional but recommended) Add the original as `upstream` so you can sync later:
+   ```bash
+   git remote add upstream https://github.com/AgreeDK/opensak.git
+   ```
+
+4. Create a branch:
+   ```bash
+   git checkout -b update-french-translation
+   ```
+
+5. Copy your updated language file into `src/opensak/lang/` and commit:
+   ```bash
+   git add src/opensak/lang/fr.py
+   git commit -m "Update French translation"
+   git push origin update-french-translation
+   ```
+
+6. Go to your fork on GitHub — click **"Compare & pull request"** and submit. The maintainer will review and merge it.
+
+**Keeping your fork up to date for future contributions:**
+```bash
+git checkout main
+git pull upstream main
+git push origin main
+```
 
 ---
 
