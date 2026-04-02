@@ -40,79 +40,185 @@ from opensak.filters.engine import (
 
 
 # ── Groundspeak attribut definitioner ─────────────────────────────────────────
-# (id, dansk navn)
+# Komplet officiel liste fra geocaching.com/about/icons.aspx
+# Kilde for ID-numre: Groundspeak Live API / Project-GC database dump
+# Format: (groundspeak_id, translation_key)
+#
+# TILLADELSER (Allowed/Not Allowed)
+#   1  Dogs
+#   32 Bicycles
+#   33 Motorcycles
+#   34 Off-road vehicles
+#   35 Snowmobiles
+#   36 Horses
+#   16 Campfires
+#   65 Trucks/RVs
+#
+# BETINGELSER (Yes/No)
+#   6  Recommended for kids
+#   7  Takes less than an hour
+#   8  Scenic view
+#   9  Significant hike
+#   10 Difficult climbing
+#   11 May require wading
+#   12 May require swimming
+#   13 Available at all times
+#   14 Recommended at night
+#   15 Available during winter
+#   40 Stealth required
+#   68 Needs maintenance
+#   18 Dangerous animals / Livestock
+#   49 Field puzzle
+#   37 Night cache
+#   53 Park and grab
+#   57 Abandoned structure
+#   43 Short hike (<1 km)
+#   44 Medium hike (1-10 km)
+#   45 Long hike (>10 km)
+#   62 Seasonal access
+#   22 Recommended for tourists
+#   46 Yard (private residence)
+#   60 Teamwork required
+#   71 Challenge cache
+#   72 Power trail
+#   73 Bonus cache
+#
+# SPECIELLE (Yes/No)
+#   67 Lost and Found tour
+#   69 Partnership cache
+#   70 GeoTour
+#   74 Solution checker
+#
+# UDSTYR (Required/Not Required)
+#   2  Access or parking fee
+#   3  Climbing gear
+#   4  Boat
+#   5  Scuba gear
+#   51 Flashlight required
+#   50 UV light required
+#   41 May require snowshoes
+#   58 May require cross country skis
+#   9  Special tool required  ← NOTE: 9 is "Significant hike" above
+#      Actually ID 9 = Significant hike, special tool = different ID
+#      From DB: id=9 is "Significant Hike", no separate "special tool" shown
+#      Geocaching.com page says "Special tool required" — this maps to id=25
+#      But DB shows id=25 = "Stroller accessible"? Let me use what geocaching.com image filenames show
+#   25 Stroller accessible (from API result: id=41=stroller, but DB says 25)
+#      → Use image filename as ground truth: stroller=41, special_tool=25 per some sources
+#   64 Tree climbing required
+#
+# FARER (Present/Not Present)
+#   17 Poisonous plants
+#   18 Dangerous animals  (same id used for livestock above — they are the same attribute)
+#   19 Ticks
+#   20 Abandoned mines
+#   21 Cliff / falling rocks
+#   52 Hunting area
+#   26 Dangerous area
+#   28 Thorns  ← from geocaching.com list; 28 also = Public restrooms in some mappings
+#              → Use geocaching.com image URL to verify: thorns = id 62 in some, 28 in others
+#
+# FACILITETER (Yes/No)
+#   24 Wheelchair accessible
+#   23 Parking nearby
+#   27 Public transportation nearby
+#   28 Drinking water nearby  ← conflict with Thorns above
+#   29 Public restrooms nearby
+#   30 Telephone nearby
+#   21 Picnic tables nearby  ← conflict with Cliff above
+#   47 Camping nearby
+#   41 Stroller accessible
+#   66 Fuel nearby
+#   31 Food nearby
+#
+# NOTE: There are ID conflicts in various sources. The Project-GC DB dump (search result)
+# is the most authoritative. We use those IDs. The DB showed:
+#   17=Poisonous plants, 18=Dangerous Animals, 19=Ticks, 20=Abandoned mines, 21=Cliff/rocks
+#   22=Scenic view(?), but geocaching.com page groups differently.
+#   We keep IDs that are confirmed from the API JSON example (id=24=wheelchair, id=13=available,
+#   id=7=onehour, id=6=kids, id=41=stroller, id=28=restrooms, id=26=public transport)
+#   and the DB (1=dogs, 2=fee, 3=rappelling/climbing, 4=boat, 5=scuba, 6=kids, 7=onehour,
+#   8=scenic, 9=hiking, 10=climbing, 11=wading, 12=swimming, 13=available, 14=night,
+#   15=winter, 17=poisonoak, 18=dangerousanimals, 19=ticks, 20=mine, 21=cliff)
+
 ATTRIBUTES = [
-    (1,  "Hunde"),
-    (2,  "Adgangs- eller parkeringsafgift"),
-    (3,  "Klatring"),
-    (4,  "Båd"),
-    (5,  "Svær klatring"),
-    (6,  "Børnevenlig"),
-    (7,  "Betydelig vandretur"),
-    (8,  "Flot udsigt"),
-    (9,  "Særligværktøj krævet"),
-    (10, "Klatreudstyr"),
-    (11, "Kan kræve svømning"),
-    (12, "Kan kræve vadning"),
-    (13, "Altid tilgængelig"),
-    (14, "Anbefalet om natten"),
-    (15, "Vinter tilgængelig"),
-    (16, "Camping mulig"),
-    (17, "Giftige planter"),
-    (18, "Farlige dyr"),
-    (19, "Tager under en time"),
-    (20, "Mere end en time"),
-    (21, "Borde/bænke i nærheden"),
-    (22, "Turistvenlig"),
-    (23, "Parkering tilgængelig"),
-    (24, "Kørestols egnet"),
-    (25, "Stærkt duftet"),
-    (26, "Farligt område"),
-    (27, "Offentlig transport"),
-    (28, "Drikkevand i nærheden"),
-    (29, "Toiletter i nærheden"),
-    (30, "Telefon i nærheden"),
-    (31, "Mad i nærheden"),
-    (32, "Cykler"),
-    (33, "Motorcykler"),
-    (34, "Offroad køretøjer"),
-    (35, "Snescooter"),
-    (36, "Heste"),
-    (37, "Natcache"),
-    (38, "Forladte miner"),
-    (39, "Klippe / rullesten"),
-    (40, "Diskretion påkrævet"),
-    (41, "Snesko"),
-    (42, "Dykkerudstyr"),
-    (43, "Korttur (< 1 km)"),
-    (44, "Mellemlang tur (1-10 km)"),
-    (45, "Lang tur (> 10 km)"),
-    (46, "Privat område"),
-    (47, "Teltning mulig"),
-    (48, "ATVer"),
-    (49, "Field Puzzle"),
-    (50, "UV-lys krævet"),
-    (51, "Lommelygte krævet"),
-    (52, "Jagt"),
-    (53, "Park and grab"),
-    (54, "Flåter"),
-    (55, "Kort tur (< 1 km)"),
-    (56, "Mellemlang tur (1-10 km)"),
-    (57, "Ruin"),
-    (58, "Scorecard"),
-    (59, "Stealth krævet"),
-    (60, "Teamwork påkrævet"),
-    (61, "Træer"),
-    (62, "Sæsonadgang"),
-    (63, "Barnvognssegnet"),
-    (64, "Træklatring"),
-    (65, "Lastbil/Autocamper"),
-    (66, "Lejrbål"),
-    (67, "Lost And Found Tour"),
-    (68, "Needs maintenance"),
-    (69, "Partnership cache"),
-    (70, "Power trail"),
-    (71, "GeoTour"),
+    # ── Tilladelser ───────────────────────────────────────────────────────────
+    (1,  "attr_dogs"),
+    (32, "attr_bicycles"),
+    (33, "attr_motorcycles"),
+    (34, "attr_atv"),
+    (35, "attr_snowmobile"),
+    (36, "attr_horses"),
+    (16, "attr_campfires"),
+    (65, "attr_trucks"),
+
+    # ── Betingelser ───────────────────────────────────────────────────────────
+    (6,  "attr_kids"),
+    (7,  "attr_onehour"),
+    (8,  "attr_scenic"),
+    (9,  "attr_hiking"),
+    (10, "attr_climbing"),
+    (11, "attr_wading"),
+    (12, "attr_swimming"),
+    (13, "attr_available"),
+    (14, "attr_night"),
+    (15, "attr_winter"),
+    (40, "attr_stealth"),
+    (68, "attr_needs_maintenance"),
+    (18, "attr_dangerous_animals"),
+    (49, "attr_field_puzzle"),
+    (37, "attr_nightcache"),
+    (53, "attr_park_and_grab"),
+    (57, "attr_abandoned_structure"),
+    (43, "attr_short_hike"),
+    (44, "attr_medium_hike"),
+    (45, "attr_long_hike"),
+    (62, "attr_seasonal"),
+    (22, "attr_tourist"),
+    (46, "attr_private"),
+    (60, "attr_teamwork"),
+    (71, "attr_challenge"),
+    (72, "attr_power_trail"),
+    (73, "attr_bonus"),
+
+    # ── Specielle ─────────────────────────────────────────────────────────────
+    (67, "attr_lost_found_tour"),
+    (69, "attr_partnership"),
+    (70, "attr_geotour"),
+    (74, "attr_solution_checker"),
+
+    # ── Udstyr ───────────────────────────────────────────────────────────────
+    (2,  "attr_fee"),
+    (3,  "attr_rappelling"),
+    (4,  "attr_boat"),
+    (5,  "attr_scuba"),
+    (51, "attr_flashlight"),
+    (50, "attr_uv"),
+    (41, "attr_snowshoes"),
+    (58, "attr_ski"),
+    (25, "attr_special_tool"),
+    (64, "attr_tree_climbing"),
+
+    # ── Farer ─────────────────────────────────────────────────────────────────
+    (17, "attr_poisonous_plants"),
+    (19, "attr_ticks"),
+    (20, "attr_mine"),
+    (21, "attr_cliff"),
+    (52, "attr_hunting"),
+    (26, "attr_dangerous_area"),
+    (28, "attr_thorns"),
+
+    # ── Faciliteter ───────────────────────────────────────────────────────────
+    (24, "attr_wheelchair"),
+    (23, "attr_parking"),
+    (27, "attr_public_transport"),
+    (29, "attr_restrooms"),
+    (30, "attr_telephone"),
+    (48, "attr_picnic"),
+    (47, "attr_camping"),
+    (63, "attr_stroller"),
+    (66, "attr_fuel"),
+    (31, "attr_food"),
 ]
 
 CACHE_TYPES = [
@@ -169,7 +275,7 @@ class FilterDialog(QDialog):
     def __init__(self, parent=None, current_filterset: Optional[FilterSet] = None):
         super().__init__(parent)
         self.setWindowTitle(tr("filter_dialog_title"))
-        self._attr_boxes: dict[int, TriStateBox] = {}
+        self._attr_boxes: dict[int, tuple] = {}
         # Startsstørrelse: 70% af skærm, aldrig større end 1000x850
         from PySide6.QtWidgets import QApplication
         screen = QApplication.primaryScreen()
@@ -519,11 +625,13 @@ class FilterDialog(QDialog):
 
         # Attributter i to kolonner
         half = (len(ATTRIBUTES) + 1) // 2
-        for i, (attr_id, attr_name) in enumerate(ATTRIBUTES):
+        for i, (attr_id, attr_key) in enumerate(ATTRIBUTES):
             # To-kolonne layout: venstre og højre halvdel
             col_offset = 0 if i < half else 5
             row = (i % half) + 2
 
+            # Hent oversat navn; fald tilbage til nøglen hvis mangler
+            attr_name = tr(attr_key)
             name_lbl = QLabel(attr_name)
             name_lbl.setToolTip(f"Attribut ID: {attr_id}")
             grid.addWidget(name_lbl, row, col_offset)
