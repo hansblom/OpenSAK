@@ -51,20 +51,23 @@ GC_REDIRECT_PORT = 7654
 GC_REDIRECT_URI = f"http://localhost:{GC_REDIRECT_PORT}/callback"
 GC_SCOPES       = "*"   # Fuld adgang — justeres evt. ved godkendelse
 
-# 
+# Cache log types
 class LogType(IntEnum):
     FOUND = 2
     DNF = 3
     NOTE = 4
     ARCHIVE = 5
 
+
+# ── Token håndtering med cache ────────────────────────────────────────────────
+
+_cached_token: Optional[dict] = None  # In-memory cache for token
+
 def get_token_file() -> Path:
     """Returnerer stien til token-filen i app data-mappen."""
     from opensak.config import get_app_data_dir
     return get_app_data_dir() / "gc_token.json"
 
-
-# ── PKCE hjælpefunktioner ──────────────────────────────────────────────────────
 
 def _generate_pkce() -> tuple[str, str]:
     """
@@ -77,10 +80,10 @@ def _generate_pkce() -> tuple[str, str]:
     return code_verifier, code_challenge
 
 
-# ── Token håndtering ──────────────────────────────────────────────────────────
-
 def _save_token(token_data: dict) -> None:
-    """Gem token til disk. Sæt filrettigheder til 600 (kun ejer kan læse)."""
+    """Gem token til disk og opdater cache. Sæt filrettigheder til 600."""
+    global _cached_token
+    _cached_token = token_data
     token_file = get_token_file()
     token_file.write_text(json.dumps(token_data, indent=2), encoding="utf-8")
     try:
@@ -91,17 +94,24 @@ def _save_token(token_data: dict) -> None:
 
 def _load_token() -> Optional[dict]:
     """Indlæs token fra disk. Returnerer None hvis filen ikke eksisterer."""
+    global _cached_token
+    if _cached_token is not None:
+        return _cached_token
+
     token_file = get_token_file()
     if not token_file.exists():
         return None
     try:
-        return json.loads(token_file.read_text(encoding="utf-8"))
+        _cached_token = json.loads(token_file.read_text(encoding="utf-8"))
+        return _cached_token
     except (json.JSONDecodeError, OSError):
         return None
 
 
 def _delete_token() -> None:
-    """Slet token-filen (log ud)."""
+    """Slet token-filen (log ud) og ryd cache."""
+    global _cached_token
+    _cached_token = None
     token_file = get_token_file()
     if token_file.exists():
         token_file.unlink()
