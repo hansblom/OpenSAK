@@ -12,6 +12,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.4.2] — 2026
+### Added
+- **Close issue #2 ** support GPX namespace groundspeak/cache/1/0 (My Finds PQ)
+
+---
+
 ## [1.4.1] — 2026
 ### Added
 - **Portuguese** (`Ctrl+T`) — Fabio have added Portugues and tests for translation completeness
