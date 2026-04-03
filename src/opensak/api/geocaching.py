@@ -35,6 +35,7 @@ import urllib.request
 from pathlib import Path
 from typing import Optional, List
 from enum import IntEnum
+from utils.utils import validate_gc_code
 
 logger = logging.getLogger(__name__)
 
@@ -389,7 +390,13 @@ def get_cache_details(gc_code: str) -> Optional[dict]:
     """
     if not GC_CLIENT_ID:
         return None
-
+    
+    try:
+        validate_gc_code(gc_code)  # Valider formatet på gc_code inden API-kald
+    except ValueError as exc:
+        logger.warning(f"Invalid gc_code: {gc_code} — {exc}")
+        return None
+    
     return _api_get(
         f"/geocaches/{gc_code}",
         params={
@@ -416,6 +423,12 @@ def get_trackables_in_cache(gc_code: str) -> Optional[list]:
         Hvert element har typisk: referenceCode, name, trackableType, owner
     """
     if not GC_CLIENT_ID:
+        return None
+    
+    try:
+        validate_gc_code(gc_code)  # Valider formatet på gc_code inden API-kald
+    except ValueError as exc:
+        logger.warning(f"Invalid gc_code: {gc_code} — {exc}")
         return None
 
     result = _api_get(
@@ -446,6 +459,7 @@ def get_user_profile() -> Optional[dict]:
         "/users/me",
         params={"fields": "referenceCode,username,avatarUrl,findCount,hideCount,membershipLevelId"},
     )
+
 
 def _get_user_logs(
     username: str,
