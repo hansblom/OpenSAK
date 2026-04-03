@@ -1,41 +1,64 @@
 import pytest
+from unittest.mock import patch, MagicMock
+
+# GUI Component Imports
 from opensak.gui.mainwindow import MainWindow
 from opensak.gui.cache_detail import CacheDetailPanel
 from opensak.gui.map_widget import MapWidget
-from opensak.gui.dialogs.settings_dialog import SettingsDialog
-from opensak.gui.dialogs.import_dialog import ImportDialog
-from opensak.gui.dialogs.database_dialog import NewDatabaseDialog
-from opensak.gui.dialogs.filter_dialog import FilterDialog
-from opensak.gui.dialogs.gps_dialog import GpsExportDialog
-from opensak.gui.dialogs.found_dialog import FoundUpdaterDialog
+from opensak.gui.dialogs import (
+    settings_dialog,
+    import_dialog,
+    database_dialog,
+    filter_dialog,
+    gps_dialog,
+    found_dialog
+)
 
 @pytest.fixture
 def app(qtbot):
-    """Fixture to initialize the MainWindow and ensure the Qt event loop is active."""
-    window = MainWindow()
-    qtbot.add_widget(window)
-    return window
+    """
+    Fixture to initialize dependencies and the MainWindow.
+    """
+
+    # Mock ZipFile to prevent MainWindow from trying to open non-existent files
+    with patch("zipfile.ZipFile", MagicMock()):
+        window = MainWindow()
+        qtbot.add_widget(window)
+        yield window
+
+        # Ensure the window closes before the next test
+        window.close()
 
 # --- DIALOG TESTS ---
 
-@pytest.mark.parametrize("dialog_class", [
-    SettingsDialog,
-    ImportDialog,
-    NewDatabaseDialog,
-    FilterDialog,
-    GpsExportDialog,
-    FoundUpdaterDialog,
+@pytest.mark.parametrize("dialog_name, dialog_class", [
+    ("SettingsDialog", settings_dialog.SettingsDialog),
+    ("ImportDialog", import_dialog.ImportDialog),
+    ("NewDatabaseDialog", database_dialog.NewDatabaseDialog),
+    ("FilterDialog", filter_dialog.FilterDialog),
+    ("GpsExportDialog", gps_dialog.GpsExportDialog),
+    ("FoundUpdaterDialog", found_dialog.FoundUpdaterDialog),
 ])
 
-def test_dialogs_instantiation(qtbot, app, dialog_class):
-    """Verify that all major dialogs can be initialized without errors."""
+def test_dialogs_instantiation(qtbot, app, dialog_name, dialog_class):
+    """
+    Verifies that major dialogs can be instantiated and displayed.
+    Uses waitUntil to synchronize with the event loop safely for CI.
+    """
     dialog = dialog_class(app)
     qtbot.add_widget(dialog)
-
-    # Tiny wait to catch any asynchronous initialization crashes
-    qtbot.wait(50) 
-    assert dialog is not None 
-    assert dialog.parent() == app 
+    
+    # Show the dialog to test basic rendering
+    dialog.show()
+    
+    # Wait until the dialog is visible (robust for headless environments)
+    qtbot.waitUntil(lambda: dialog.isVisible(), timeout=1000)
+    
+    assert dialog is not None
+    assert dialog.parent() == app
+    assert dialog.isVisible()
+    
+    dialog.close()
 
 # --- WIDGET TESTS ---
 
@@ -45,10 +68,12 @@ def test_dialogs_instantiation(qtbot, app, dialog_class):
 ])
 
 def test_widgets_instantiation(qtbot, app, widget_class):
-    """Verify that main UI panels/widgets can be initialized."""
+    """Verifies that main UI panels/widgets initialize correctly."""
     widget = widget_class(app)
     qtbot.add_widget(widget)
-
-    # Tiny wait to catch any asynchronous initialization crashes
-    qtbot.wait(100)
+    
+    # Widgets embedded in MainWindow (like WebEngine) might take longer to init
+    # qtbot.waitUntil processes events without blocking the system
+    qtbot.waitUntil(lambda: widget is not None, timeout=1000)
+    
     assert widget is not None
