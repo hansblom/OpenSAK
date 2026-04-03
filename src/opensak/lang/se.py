@@ -18,7 +18,7 @@ STRINGS: dict[str, str] = {
     "save":                         "Spara",
     "delete":                       "Ta bort",
     "add":                          "Lägg till",
-    "edit":                         "Editer",
+    "edit":                         "Editera",
     "error":                        "Fel",
     "warning":                      "Varning",
     "info":                         "Information",
