@@ -20,6 +20,7 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "pytest-cov",
+    "pytest-qt",
 ]
 
 [tool.setuptools.packages.find]
@@ -31,4 +32,5 @@ pythonpath = ["src"]
 
 [project.scripts]
 opensak = "opensak.utils.run_cli:main"
+opensak-test = "opensak.utils.run_test:run"
 opensak-doctor = "opensak.utils.doctor:run"
