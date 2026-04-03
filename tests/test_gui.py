@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 # GUI Component Imports
@@ -72,8 +73,15 @@ def test_widgets_instantiation(qtbot, app, widget_class):
     widget = widget_class(app)
     qtbot.add_widget(widget)
     
-    # Widgets embedded in MainWindow (like WebEngine) might take longer to init
-    # qtbot.waitUntil processes events without blocking the system
-    qtbot.waitUntil(lambda: widget is not None, timeout=1000)
-    
+    # Wait until the widget is created
+    qtbot.waitUntil(lambda: widget is not None, timeout=2000)
     assert widget is not None
+
+    # --- PREVENT WEBENGINE SEGFAULT ---
+    # We must explicitly destroy widgets containing WebEngine before the 
+    # test session ends, otherwise the render process crashes on exit.
+    widget.setParent(None)
+    widget.deleteLater()
+    
+    # Process events to ensure deleteLater() is executed
+    qtbot.wait(100)
