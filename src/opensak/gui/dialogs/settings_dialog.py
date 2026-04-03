@@ -3,35 +3,100 @@ src/opensak/gui/dialogs/settings_dialog.py — Settings dialog.
 """
 
 from __future__ import annotations
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
     QLabel, QLineEdit, QCheckBox, QPushButton,
     QDialogButtonBox, QGroupBox, QComboBox,
     QMessageBox, QTableWidget, QTableWidgetItem,
-    QHeaderView, QAbstractItemView
+    QHeaderView, QAbstractItemView, QTabWidget, QWidget,
+    QFrame, QSizePolicy
 )
+from PySide6.QtGui import QPixmap, QFont
 from opensak.gui.settings import get_settings, HomePoint
 from opensak.lang import tr, AVAILABLE_LANGUAGES, current_language
 from opensak.coords import FORMATS, FORMAT_DMM, FORMAT_DMS, FORMAT_DD, format_coords
 
 
+# ── Baggrundstråd til OAuth + API-kald ───────────────────────────────────────
+
+class _OAuthWorker(QThread):
+    """Kører OAuth flow i baggrunden så GUI ikke fryser."""
+    success = Signal(dict)   # token dict
+    error   = Signal(str)    # fejlbesked
+
+    def run(self):
+        try:
+            from opensak.api.geocaching import start_oauth_flow
+            token = start_oauth_flow()
+            if token:
+                self.success.emit(token)
+            else:
+                self.error.emit(tr("gc_login_no_client_id"))
+        except Exception as exc:
+            self.error.emit(str(exc))
+
+
+class _ProfileWorker(QThread):
+    """Henter brugerprofil i baggrunden."""
+    success = Signal(dict)
+    error   = Signal(str)
+
+    def run(self):
+        try:
+            from opensak.api.geocaching import get_user_profile
+            profile = get_user_profile()
+            if profile:
+                self.success.emit(profile)
+            else:
+                self.error.emit(tr("gc_profile_error"))
+        except Exception as exc:
+            self.error.emit(str(exc))
+
+
+# ── Hoved-dialog ──────────────────────────────────────────────────────────────
+
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle(tr("settings_dialog_title"))
-        self.setMinimumWidth(480)
+        self.setMinimumWidth(520)
+        self._oauth_worker   = None
+        self._profile_worker = None
         self._setup_ui()
         self._load()
 
     def _setup_ui(self) -> None:
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)
+
+        # Tab-widget med tre faner
+        self._tabs = QTabWidget()
+        self._tabs.addTab(self._build_general_tab(),  tr("settings_tab_general"))
+        self._tabs.addTab(self._build_gc_tab(),        tr("settings_tab_geocaching"))
+
+        layout.addWidget(self._tabs)
+
+        # Knapper
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok |
+            QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.accepted.connect(self._save)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    # ── Fane 1: Generelle indstillinger ──────────────────────────────────────
+
+    def _build_general_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(6, 6, 6, 6)
 
         # ── Hjemmepunkter ─────────────────────────────────────────────────────
         loc_group = QGroupBox(tr("settings_group_location"))
         loc_layout = QVBoxLayout(loc_group)
 
-        # Tabel over gemte punkter
         self._points_table = QTableWidget(0, 3)
         self._points_table.setHorizontalHeaderLabels([
             tr("settings_hp_col_name"),
@@ -64,7 +129,6 @@ class SettingsDialog(QDialog):
         self._points_table.itemSelectionChanged.connect(self._on_point_selected)
         loc_layout.addWidget(self._points_table)
 
-        # Knapper til liste-håndtering
         list_btn_row = QHBoxLayout()
         self._btn_activate = QPushButton(tr("settings_hp_activate"))
         self._btn_activate.setEnabled(False)
@@ -80,11 +144,9 @@ class SettingsDialog(QDialog):
         self._btn_delete.setEnabled(False)
         self._btn_delete.clicked.connect(self._delete_point)
         list_btn_row.addWidget(self._btn_delete)
-
         list_btn_row.addStretch()
         loc_layout.addLayout(list_btn_row)
 
-        # Tilføj / rediger punkt
         add_group = QGroupBox(tr("settings_hp_add_group"))
         add_layout = QVBoxLayout(add_group)
 
@@ -173,15 +235,222 @@ class SettingsDialog(QDialog):
         lang_layout.addWidget(hint)
 
         layout.addWidget(lang_group)
+        layout.addStretch()
+        return tab
 
-        # ── Knapper ───────────────────────────────────────────────────────────
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok |
-            QDialogButtonBox.StandardButton.Cancel
+    # ── Fane 2: Geocaching.com ────────────────────────────────────────────────
+
+    def _build_gc_tab(self) -> QWidget:
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(12)
+
+        # Status-boks (viser login-status + brugerinfo)
+        status_frame = QFrame()
+        status_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        status_frame.setStyleSheet(
+            "QFrame { border-radius: 6px; padding: 8px; }"
         )
-        buttons.accepted.connect(self._save)
-        buttons.rejected.connect(self.reject)
-        layout.addWidget(buttons)
+        status_layout = QVBoxLayout(status_frame)
+        status_layout.setSpacing(4)
+
+        # Ikon + navn i samme række
+        top_row = QHBoxLayout()
+
+        self._gc_status_icon = QLabel("○")
+        self._gc_status_icon.setFont(QFont("Sans Serif", 20))
+        self._gc_status_icon.setFixedWidth(36)
+        top_row.addWidget(self._gc_status_icon)
+
+        name_col = QVBoxLayout()
+        self._gc_username_label = QLabel(tr("gc_not_logged_in"))
+        self._gc_username_label.setFont(QFont("Sans Serif", 11, QFont.Weight.Bold))
+        name_col.addWidget(self._gc_username_label)
+
+        self._gc_status_label = QLabel(tr("gc_status_offline"))
+        self._gc_status_label.setStyleSheet("color: gray; font-size: 10px;")
+        name_col.addWidget(self._gc_status_label)
+        name_col.addStretch()
+
+        top_row.addLayout(name_col)
+        top_row.addStretch()
+        status_layout.addLayout(top_row)
+
+        # Fund-tæller
+        self._gc_finds_label = QLabel("")
+        self._gc_finds_label.setStyleSheet("color: gray; font-size: 10px; padding-left: 40px;")
+        status_layout.addWidget(self._gc_finds_label)
+
+        layout.addWidget(status_frame)
+
+        # Knap-række
+        btn_row = QHBoxLayout()
+
+        self._gc_login_btn = QPushButton(tr("gc_login_btn"))
+        self._gc_login_btn.setMinimumWidth(140)
+        self._gc_login_btn.clicked.connect(self._on_gc_login)
+        btn_row.addWidget(self._gc_login_btn)
+
+        self._gc_logout_btn = QPushButton(tr("gc_logout_btn"))
+        self._gc_logout_btn.setMinimumWidth(100)
+        self._gc_logout_btn.clicked.connect(self._on_gc_logout)
+        self._gc_logout_btn.setEnabled(False)
+        btn_row.addWidget(self._gc_logout_btn)
+
+        self._gc_refresh_btn = QPushButton(tr("gc_refresh_btn"))
+        self._gc_refresh_btn.setMinimumWidth(100)
+        self._gc_refresh_btn.clicked.connect(self._on_gc_refresh_profile)
+        self._gc_refresh_btn.setEnabled(False)
+        btn_row.addWidget(self._gc_refresh_btn)
+
+        btn_row.addStretch()
+        layout.addLayout(btn_row)
+
+        # Separator
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        sep.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(sep)
+
+        # Forklaring — hvad bruges API'en til
+        info_group = QGroupBox(tr("gc_info_group"))
+        info_layout = QVBoxLayout(info_group)
+
+        for text_key in [
+            "gc_info_favorites",
+            "gc_info_trackables",
+            "gc_info_finds",
+        ]:
+            row = QHBoxLayout()
+            bullet = QLabel("•")
+            bullet.setFixedWidth(14)
+            row.addWidget(bullet)
+            lbl = QLabel(tr(text_key))
+            lbl.setWordWrap(True)
+            row.addWidget(lbl)
+            info_layout.addLayout(row)
+
+        layout.addWidget(info_group)
+
+        # API-status note (vises kun hvis CLIENT_ID ikke er sat)
+        self._gc_api_note = QLabel(tr("gc_api_not_configured"))
+        self._gc_api_note.setStyleSheet(
+            "color: #b07800; font-size: 10px; padding: 4px;"
+            "background: #fff8e1; border-radius: 4px;"
+        )
+        self._gc_api_note.setWordWrap(True)
+        layout.addWidget(self._gc_api_note)
+
+        layout.addStretch()
+        return tab
+
+    # ── GC login/logout ───────────────────────────────────────────────────────
+
+    def _on_gc_login(self) -> None:
+        """Start OAuth flow i baggrundstråd."""
+        from opensak.api.geocaching import GC_CLIENT_ID
+        if not GC_CLIENT_ID:
+            QMessageBox.information(
+                self,
+                tr("gc_login_unavailable_title"),
+                tr("gc_login_unavailable_msg"),
+            )
+            return
+
+        self._gc_login_btn.setEnabled(False)
+        self._gc_login_btn.setText(tr("gc_login_waiting"))
+        self._gc_status_label.setText(tr("gc_status_waiting"))
+
+        self._oauth_worker = _OAuthWorker(self)
+        self._oauth_worker.success.connect(self._on_gc_login_success)
+        self._oauth_worker.error.connect(self._on_gc_login_error)
+        self._oauth_worker.start()
+
+    def _on_gc_login_success(self, token: dict) -> None:
+        self._gc_login_btn.setText(tr("gc_login_btn"))
+        self._gc_login_btn.setEnabled(False)
+        self._gc_logout_btn.setEnabled(True)
+        self._gc_refresh_btn.setEnabled(True)
+        self._gc_status_label.setText(tr("gc_status_online"))
+        self._gc_status_label.setStyleSheet("color: #2e7d32; font-size: 10px;")
+        self._gc_status_icon.setText("●")
+        self._gc_status_icon.setStyleSheet("color: #2e7d32;")
+        # Hent profil med det samme
+        self._on_gc_refresh_profile()
+
+    def _on_gc_login_error(self, msg: str) -> None:
+        self._gc_login_btn.setEnabled(True)
+        self._gc_login_btn.setText(tr("gc_login_btn"))
+        self._gc_status_label.setText(tr("gc_status_offline"))
+        QMessageBox.warning(self, tr("gc_login_error_title"), msg)
+
+    def _on_gc_logout(self) -> None:
+        reply = QMessageBox.question(
+            self,
+            tr("gc_logout_title"),
+            tr("gc_logout_confirm"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            from opensak.api.geocaching import logout
+            logout()
+            self._update_gc_ui_logged_out()
+
+    def _on_gc_refresh_profile(self) -> None:
+        self._gc_refresh_btn.setEnabled(False)
+        self._gc_status_label.setText(tr("gc_status_fetching"))
+
+        self._profile_worker = _ProfileWorker(self)
+        self._profile_worker.success.connect(self._on_profile_loaded)
+        self._profile_worker.error.connect(self._on_profile_error)
+        self._profile_worker.start()
+
+    def _on_profile_loaded(self, profile: dict) -> None:
+        username  = profile.get("username", "?")
+        finds     = profile.get("findCount", "?")
+        self._gc_username_label.setText(username)
+        self._gc_finds_label.setText(tr("gc_find_count", count=finds))
+        self._gc_status_label.setText(tr("gc_status_online"))
+        self._gc_status_label.setStyleSheet("color: #2e7d32; font-size: 10px;")
+        self._gc_status_icon.setText("●")
+        self._gc_status_icon.setStyleSheet("color: #2e7d32;")
+        self._gc_refresh_btn.setEnabled(True)
+        self._gc_login_btn.setEnabled(False)
+        self._gc_logout_btn.setEnabled(True)
+
+    def _on_profile_error(self, msg: str) -> None:
+        self._gc_status_label.setText(tr("gc_status_error"))
+        self._gc_status_label.setStyleSheet("color: #c62828; font-size: 10px;")
+        self._gc_refresh_btn.setEnabled(True)
+
+    def _update_gc_ui_logged_out(self) -> None:
+        self._gc_username_label.setText(tr("gc_not_logged_in"))
+        self._gc_finds_label.setText("")
+        self._gc_status_label.setText(tr("gc_status_offline"))
+        self._gc_status_label.setStyleSheet("color: gray; font-size: 10px;")
+        self._gc_status_icon.setText("○")
+        self._gc_status_icon.setStyleSheet("")
+        self._gc_login_btn.setEnabled(True)
+        self._gc_logout_btn.setEnabled(False)
+        self._gc_refresh_btn.setEnabled(False)
+
+    def _refresh_gc_status_on_open(self) -> None:
+        """Tjek login-status når dialogen åbnes."""
+        from opensak.api.geocaching import is_logged_in, GC_CLIENT_ID
+
+        # Skjul API-note hvis CLIENT_ID er sat
+        self._gc_api_note.setVisible(not bool(GC_CLIENT_ID))
+
+        if is_logged_in():
+            self._gc_login_btn.setEnabled(False)
+            self._gc_logout_btn.setEnabled(True)
+            self._gc_refresh_btn.setEnabled(True)
+            self._gc_status_label.setText(tr("gc_status_fetching"))
+            self._on_gc_refresh_profile()
+        else:
+            self._update_gc_ui_logged_out()
 
     # ── Hjemmepunkter — hjælpefunktioner ──────────────────────────────────────
 
@@ -192,22 +461,18 @@ class SettingsDialog(QDialog):
         fmt = s.coord_format
         self._points_table.setRowCount(len(points))
         for row, p in enumerate(points):
-            # Navn — marker aktiv med stjerne
             label = f"★  {p.name}" if p.name == active else p.name
             name_item = QTableWidgetItem(label)
             if p.name == active:
                 name_item.setForeground(Qt.GlobalColor.darkGreen)
 
-            # Koordinater i valgt format
             coords_str = format_coords(p.lat, p.lon, fmt)
-            parts = coords_str.split()
-            # DMM: "N55 47.250 E012 25.000" -> lat=parts[0:2], lon=parts[2:4]
-            # DD:  "55.78750, 12.41667"      -> split on comma
             if "," in coords_str:
                 halves = coords_str.split(",")
                 lat_str = halves[0].strip()
                 lon_str = halves[1].strip() if len(halves) > 1 else ""
             else:
+                parts = coords_str.split()
                 mid = len(parts) // 2
                 lat_str = " ".join(parts[:mid])
                 lon_str = " ".join(parts[mid:])
@@ -257,7 +522,6 @@ class SettingsDialog(QDialog):
             self._reload_points_table()
 
     def _edit_point(self) -> None:
-        """Udfyld input-felterne med det valgte punkt til redigering."""
         p = self._selected_point()
         if not p:
             return
@@ -267,7 +531,6 @@ class SettingsDialog(QDialog):
         self._new_name.setFocus()
 
     def _on_coord_changed(self, text: str) -> None:
-        """Live validering — vis koordinat i valgt format ved gyldig input."""
         if not text.strip():
             self._coord_hint.setText("")
             return
@@ -286,7 +549,6 @@ class SettingsDialog(QDialog):
             )
 
     def _add_point(self) -> None:
-        """Tilføj eller opdatér hjemmepunkt fra input-felterne."""
         name = self._new_name.text().strip()
         coord_text = self._new_coord.text().strip()
 
@@ -307,7 +569,6 @@ class SettingsDialog(QDialog):
         point = HomePoint(name, lat, lon)
         s.add_or_update_home_point(point)
 
-        # Første punkt aktiveres automatisk
         if len(s.home_points) == 1 or not s.active_home_name:
             s.set_active_home(point)
 
@@ -330,6 +591,8 @@ class SettingsDialog(QDialog):
         self._coord_format.setCurrentIndex(idx if idx >= 0 else 0)
         lang_idx = self._lang_combo.findData(current_language())
         self._lang_combo.setCurrentIndex(lang_idx if lang_idx >= 0 else 0)
+        # Opdater GC-status
+        self._refresh_gc_status_on_open()
 
     def _save(self) -> None:
         s = get_settings()

@@ -171,7 +171,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-python run.py
+opensak # or python run.py
 ```
 
 #### Windows (manual)
@@ -187,7 +187,7 @@ cd opensak
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-python run.py
+opensak # or python run.py
 ```
 
 #### macOS (manual)
@@ -204,8 +204,26 @@ cd opensak
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python run.py
+opensak # or python run.py
 ```
+
+#### Diagnostics (opensak-doctor)
+
+OpenSAK includes a diagnostic tool to help troubleshoot installation or environment issues. This is especially useful if the application fails to start or behaves unexpectedly.
+
+After installing OpenSAK, run the following command in your terminal:
+
+```bash
+opensak-doctor
+```
+
+What it checks:
+
+- The diagnostic tool performs several environment checks:
+- Python version – ensures your system meets the required Python version for OpenSAK.
+- Virtual environment – checks if you are running OpenSAK inside a virtual environment.
+- Dependencies – verifies that all required Python packages are installed.
+- Configuration directory – ensures OpenSAK can create and write to ~/.opensak.
 
 ---
 

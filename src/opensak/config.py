@@ -47,6 +47,14 @@ def get_log_path() -> Path:
     return get_app_data_dir() / "opensak.log"
 
 
+def get_gc_token_path() -> Path:
+    """
+    Return the path to the Geocaching.com OAuth token file.
+    File is stored with chmod 600 (only owner can read).
+    """
+    return get_app_data_dir() / "gc_token.json"
+
+
 # ── Language / Preferences ────────────────────────────────────────────────────
 
 _PREFS_FILE = None
@@ -99,6 +107,7 @@ def print_config() -> None:
     print(f"  Database     : {get_db_path()}")
     print(f"  GPX imports  : {get_gpx_import_dir()}")
     print(f"  Log file     : {get_log_path()}")
+    print(f"  GC token     : {get_gc_token_path()}")
     print(f"  Language     : {get_language()}")
 
 

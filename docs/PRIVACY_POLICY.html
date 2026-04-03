@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — OpenSAK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d1117; --surface: #161b22; --border: #21262d;
+      --accent: #3fb950; --accent2: #58a6ff;
+      --text: #e6edf3; --muted: #7d8590;
+      --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.7; }
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 56px;
+      background: rgba(13,17,23,0.95); border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: var(--mono); font-size: 1rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+    .nav-logo span { color: var(--muted); font-weight: 400; }
+    nav a.back { font-size: 0.82rem; color: var(--muted); text-decoration: none; }
+    nav a.back:hover { color: var(--text); }
+    main { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+    .doc-label { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+    h1 { font-family: var(--mono); font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.3rem; }
+    .effective { font-size: 0.82rem; color: var(--muted); font-style: italic; margin-bottom: 2.5rem; }
+    .rule { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+    h2 { font-family: var(--mono); font-size: 1rem; font-weight: 700; color: var(--accent2); margin: 2rem 0 0.6rem; letter-spacing: -0.01em; }
+    h3 { font-size: 0.9rem; font-weight: 600; color: var(--text); margin: 1.5rem 0 0.4rem; }
+    p { color: #8b949e; font-weight: 300; margin-bottom: 0.8rem; }
+    ul { color: #8b949e; font-weight: 300; padding-left: 1.4rem; margin-bottom: 0.8rem; }
+    li { margin-bottom: 0.3rem; }
+    a { color: var(--accent2); }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.875rem; }
+    th { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 0.6rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: #8b949e; font-family: var(--mono); font-size: 0.8rem; }
+    td:first-child { color: var(--text); font-weight: 700; }
+    footer-note { display: block; text-align: center; margin-top: 3rem; font-size: 0.8rem; color: var(--muted); font-style: italic; }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Open<span>SAK</span></a>
+  <a href="/" class="back">← Back to opensak.com</a>
+</nav>
+<main>
+  <p class="doc-label">// Legal</p>
+  <h1>Privacy Policy</h1>
+  <p class="effective">Effective date: April 3, 2026</p>
+
+  <h2>1. Overview</h2>
+  <p>OpenSAK is a free, open source desktop application for managing geocaching data locally on your own computer. It runs on Windows, Linux, and macOS.</p>
+  <p>The short version:</p>
+  <ul>
+    <li>OpenSAK does <strong>not</strong> operate any servers or cloud services</li>
+    <li>All your geocaching data is stored exclusively on <strong>your own device</strong></li>
+    <li>OpenSAK does <strong>not</strong> sell, share, or transmit your personal data</li>
+    <li>OpenSAK does <strong>not</strong> contain any analytics, advertising, or tracking</li>
+  </ul>
+  <p>Full source code: <a href="https://github.com/AgreeDK/opensak">github.com/AgreeDK/opensak</a></p>
+
+  <hr class="rule">
+
+  <h2>2. Data Stored Locally on Your Device</h2>
+
+  <h3>2.1 Geocache data</h3>
+  <p>When you import GPX files or Pocket Query ZIP files, OpenSAK stores geocache information in a local SQLite database on your device — including cache names, GC codes, coordinates, descriptions, logs, attributes, and trackable listings. This data originates from files you supply. OpenSAK does not fetch this data independently.</p>
+
+  <h3>2.2 User preferences</h3>
+  <p>Home point coordinates, display preferences, filter profiles, and column layout are stored in your platform's standard application data directory and never leave your device.</p>
+
+  <h3>2.3 Geocaching.com authentication token (optional)</h3>
+  <p>If you connect OpenSAK to your Geocaching.com account (optional, requires API approval), an OAuth 2.0 token is stored locally with restricted file permissions. It is never transmitted to any OpenSAK server. You can delete it at any time by logging out.</p>
+
+  <table>
+    <thead><tr><th>Platform</th><th>Token path</th></tr></thead>
+    <tbody>
+      <tr><td>Linux</td><td>~/.local/share/opensak/gc_token.json</td></tr>
+      <tr><td>Windows</td><td>%APPDATA%\opensak\gc_token.json</td></tr>
+      <tr><td>macOS</td><td>~/Library/Application Support/opensak/gc_token.json</td></tr>
+    </tbody>
+  </table>
+
+  <hr class="rule">
+
+  <h2>3. Data We Do Not Collect</h2>
+  <ul>
+    <li>Usage statistics or analytics</li>
+    <li>Crash reports or error telemetry</li>
+    <li>Your location or GPS data</li>
+    <li>Your name or email address</li>
+    <li>Any data about how you use the application</li>
+  </ul>
+  <p>There are no third-party SDKs, advertising networks, or tracking libraries in OpenSAK.</p>
+
+  <hr class="rule">
+
+  <h2>4. Geocaching.com API Integration (Optional)</h2>
+  <p>When the optional API integration is enabled, OpenSAK may retrieve favorite point counts, trackable listings, and your find history directly from Geocaching.com on your behalf. This data is stored only in your local database and is subject to <a href="https://www.geocaching.com/account/documents/privacypolicy">Geocaching.com's Privacy Policy</a>.</p>
+
+  <hr class="rule">
+
+  <h2>5. Third-Party Services</h2>
+  <h3>5.1 Map tiles</h3>
+  <p>The in-app map fetches tiles from OpenStreetMap servers. Standard web requests may include your IP address. See <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy">OSM Privacy Policy</a>.</p>
+  <h3>5.2 Garmin GPS devices</h3>
+  <p>Cache export to Garmin writes a GPX file via USB. No data is transmitted over the internet.</p>
+
+  <hr class="rule">
+
+  <h2>6. Your Rights and Data Control</h2>
+  <ul>
+    <li>Delete your cache database at any time from the Database menu</li>
+    <li>Log out of Geocaching.com at any time in Settings — this deletes the stored token</li>
+    <li>Uninstall OpenSAK and remove all files from your application data directory</li>
+  </ul>
+  <p>There is no account to delete and no server-side data. Your data exists only on your device.</p>
+
+  <hr class="rule">
+
+  <h2>7. Children's Privacy</h2>
+  <p>OpenSAK does not knowingly collect any information from children.</p>
+
+  <hr class="rule">
+
+  <h2>8. Changes to This Policy</h2>
+  <p>Updates will be published on GitHub and announced in the OpenSAK Facebook community. The effective date above will be updated accordingly.</p>
+
+  <hr class="rule">
+
+  <h2>9. Contact</h2>
+  <ul>
+    <li>GitHub Issues: <a href="https://github.com/AgreeDK/opensak/issues">github.com/AgreeDK/opensak/issues</a></li>
+    <li>Facebook: OpenSAK — Open Source Geocache Manager</li>
+  </ul>
+
+  <span footer-note>OpenSAK is free, open source software licensed under the MIT License.</span>
+</main>
+</body>
+</html>
