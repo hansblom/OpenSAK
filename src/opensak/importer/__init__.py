@@ -22,10 +22,22 @@ from sqlalchemy.orm import Session
 from opensak.db.models import Attribute, Cache, Log, Trackable, UserNote, Waypoint
 
 # ── XML namespace map used by Groundspeak Pocket Queries ─────────────────────
+# Primary namespace map — uses /1/0/1 (newer PQ files)
 NS = {
     "gpx": "http://www.topografix.com/GPX/1/0",
     "gs":  "http://www.groundspeak.com/cache/1/0/1",
 }
+
+# Older PQ files (including My Finds) use /1/0 without the trailing /1
+_GS_NAMESPACES = [
+    "http://www.groundspeak.com/cache/1/0/1",
+    "http://www.groundspeak.com/cache/1/0",
+]
+
+
+def _make_ns(gs_uri: str) -> dict:
+    """Return a namespace dict with the given Groundspeak URI."""
+    return {"gpx": "http://www.topografix.com/GPX/1/0", "gs": gs_uri}
 
 
 def _text(element, xpath: str, ns: dict = NS) -> Optional[str]:
@@ -150,36 +162,38 @@ def _parse_wpt(wpt_el) -> Optional[dict]:
     hidden_raw = _text(wpt_el, "gpx:time", NS)
 
     # ── Groundspeak extension block ───────────────────────────────────────────
-    gs_cache = wpt_el.find("gs:cache", NS)
-    if gs_cache is None:
-        # Try without namespace prefix (some files omit it)
-        gs_cache = wpt_el.find(
-            "{http://www.groundspeak.com/cache/1/0/1}cache"
-        )
+    # Detect which Groundspeak namespace this file actually uses (/1/0 or /1/0/1)
+    gs_cache = None
+    active_ns = NS  # default
+    for gs_uri in _GS_NAMESPACES:
+        gs_cache = wpt_el.find(f"{{{gs_uri}}}cache")
+        if gs_cache is not None:
+            active_ns = _make_ns(gs_uri)
+            break
 
-    gs_id        = gs_cache.get("id")           if gs_cache is not None else None
-    available    = _bool_attr(gs_cache, "@available") if gs_cache is not None else True
-    archived     = _bool_attr(gs_cache, "@archived")  if gs_cache is not None else False
+    gs_id        = gs_cache.get("id")                    if gs_cache is not None else None
+    available    = _bool_attr(gs_cache, "@available")    if gs_cache is not None else True
+    archived     = _bool_attr(gs_cache, "@archived")     if gs_cache is not None else False
 
-    name         = _text(gs_cache, "gs:name",              NS) or _text(wpt_el, "gpx:urlname", NS) or gc_code
-    placed_by    = _text(gs_cache, "gs:placed_by",         NS)
-    owner        = _text(gs_cache, "gs:owner",             NS)
-    owner_id     = gs_cache.find("gs:owner", NS).get("id") if gs_cache is not None and gs_cache.find("gs:owner", NS) is not None else None
-    cache_type   = _text(gs_cache, "gs:type",              NS) or cache_type_full
-    container    = _text(gs_cache, "gs:container",         NS)
-    difficulty   = _float(gs_cache, "gs:difficulty",       NS)
-    terrain      = _float(gs_cache, "gs:terrain",          NS)
-    country      = _text(gs_cache, "gs:country",           NS)
-    state        = _text(gs_cache, "gs:state",             NS)
-    short_desc   = _text(gs_cache, "gs:short_description", NS)
-    long_desc    = _text(gs_cache, "gs:long_description",  NS)
-    hints        = _text(gs_cache, "gs:encoded_hints",     NS)
+    name         = _text(gs_cache, "gs:name",              active_ns) or _text(wpt_el, "gpx:urlname", NS) or gc_code
+    placed_by    = _text(gs_cache, "gs:placed_by",         active_ns)
+    owner        = _text(gs_cache, "gs:owner",             active_ns)
+    owner_id     = gs_cache.find("gs:owner", active_ns).get("id") if gs_cache is not None and gs_cache.find("gs:owner", active_ns) is not None else None
+    cache_type   = _text(gs_cache, "gs:type",              active_ns) or cache_type_full
+    container    = _text(gs_cache, "gs:container",         active_ns)
+    difficulty   = _float(gs_cache, "gs:difficulty",       active_ns)
+    terrain      = _float(gs_cache, "gs:terrain",          active_ns)
+    country      = _text(gs_cache, "gs:country",           active_ns)
+    state        = _text(gs_cache, "gs:state",             active_ns)
+    short_desc   = _text(gs_cache, "gs:short_description", active_ns)
+    long_desc    = _text(gs_cache, "gs:long_description",  active_ns)
+    hints        = _text(gs_cache, "gs:encoded_hints",     active_ns)
 
     short_html = False
     long_html  = False
     if gs_cache is not None:
-        sd_el = gs_cache.find("gs:short_description", NS)
-        ld_el = gs_cache.find("gs:long_description",  NS)
+        sd_el = gs_cache.find("gs:short_description", active_ns)
+        ld_el = gs_cache.find("gs:long_description",  active_ns)
         if sd_el is not None:
             short_html = (sd_el.get("html", "False").lower() == "true")
         if ld_el is not None:
@@ -188,7 +202,7 @@ def _parse_wpt(wpt_el) -> Optional[dict]:
     # ── Attributes ────────────────────────────────────────────────────────────
     attributes = []
     if gs_cache is not None:
-        for attr_el in gs_cache.findall("gs:attributes/gs:attribute", NS):
+        for attr_el in gs_cache.findall("gs:attributes/gs:attribute", active_ns):
             try:
                 attr_id = int(attr_el.get("id", 0))
                 is_on   = attr_el.get("inc", "1") == "1"
@@ -200,14 +214,14 @@ def _parse_wpt(wpt_el) -> Optional[dict]:
     # ── Logs ─────────────────────────────────────────────────────────────────
     logs = []
     if gs_cache is not None:
-        for log_el in gs_cache.findall("gs:logs/gs:log", NS):
+        for log_el in gs_cache.findall("gs:logs/gs:log", active_ns):
             log_id   = log_el.get("id")
-            log_type = _text(log_el, "gs:type",   NS)
-            log_date = _parse_datetime(_text(log_el, "gs:date", NS))
-            finder   = _text(log_el, "gs:finder", NS)
-            finder_el = log_el.find("gs:finder", NS)
+            log_type = _text(log_el, "gs:type",   active_ns)
+            log_date = _parse_datetime(_text(log_el, "gs:date", active_ns))
+            finder   = _text(log_el, "gs:finder", active_ns)
+            finder_el = log_el.find("gs:finder", active_ns)
             finder_id = finder_el.get("id") if finder_el is not None else None
-            text_el  = log_el.find("gs:text", NS)
+            text_el  = log_el.find("gs:text", active_ns)
             log_text = text_el.text.strip() if text_el is not None and text_el.text else None
             encoded  = (text_el.get("encoded", "False").lower() == "true") if text_el is not None else False
 
@@ -225,7 +239,7 @@ def _parse_wpt(wpt_el) -> Optional[dict]:
     # ── Trackables ────────────────────────────────────────────────────────────
     trackables = []
     if gs_cache is not None:
-        for tb_el in gs_cache.findall("gs:travelbugs/gs:travelbug", NS):
+        for tb_el in gs_cache.findall("gs:travelbugs/gs:travelbug", active_ns):
             trackables.append({
                 "ref":  tb_el.get("ref"),
                 "name": _text(tb_el, "gs:name", NS),
