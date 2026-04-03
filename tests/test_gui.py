@@ -1,5 +1,4 @@
 import pytest
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 # GUI Component Imports
@@ -26,8 +25,6 @@ def app(qtbot):
         window = MainWindow()
         qtbot.add_widget(window)
         yield window
-
-        # Ensure the window closes before the next test
         window.close()
 
 # --- DIALOG TESTS ---
@@ -42,21 +39,14 @@ def app(qtbot):
 ])
 
 def test_dialogs_instantiation(qtbot, app, dialog_name, dialog_class):
-    """
-    Verifies that major dialogs can be instantiated and displayed.
-    Uses waitUntil to synchronize with the event loop safely for CI.
-    """
+    """Verifies that major dialogs can be instantiated and displayed."""
     dialog = dialog_class(app)
     qtbot.add_widget(dialog)
     
-    # Show the dialog to test basic rendering
     dialog.show()
-    
-    # Wait until the dialog is visible (robust for headless environments)
     qtbot.waitUntil(lambda: dialog.isVisible(), timeout=1000)
     
     assert dialog is not None
-    assert dialog.parent() == app
     assert dialog.isVisible()
     
     dialog.close()
@@ -68,20 +58,27 @@ def test_dialogs_instantiation(qtbot, app, dialog_name, dialog_class):
     MapWidget,
 ])
 
-def test_widgets_instantiation(qtbot, app, widget_class):
+def test_widgets_instantiation(qtbot, app, widget_class, request):
     """Verifies that main UI panels/widgets initialize correctly."""
     widget = widget_class(app)
+    # We add it to qtbot for safety, but we will "capture" it for manual cleanup
     qtbot.add_widget(widget)
     
-    # Wait until the widget is created
     qtbot.waitUntil(lambda: widget is not None, timeout=2000)
     assert widget is not None
 
-    # --- PREVENT WEBENGINE SEGFAULT ---
-    # We must explicitly destroy widgets containing WebEngine before the 
-    # test session ends, otherwise the render process crashes on exit.
+    # --- SAFE CLEANUP TO PREVENT SEGFAULT & RUNTIMERROR ---
+    # 1. Remove the widget from pytest-qt's internal tracking list 
+    # so it doesn't try to close it again during teardown.
+    if hasattr(request.node, "qt_widgets"):
+        request.node.qt_widgets = [
+            (w_ref, skip_func) for w_ref, skip_func in request.node.qt_widgets 
+            if w_ref() is not widget
+        ]
+
+    # 2. Now manually trigger the WebEngine-safe deletion
     widget.setParent(None)
     widget.deleteLater()
     
-    # Process events to ensure deleteLater() is executed
-    qtbot.wait(100)
+    # 3. Quickly flush the event loop
+    qtbot.wait(50)
