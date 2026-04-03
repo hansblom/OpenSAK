@@ -74,7 +74,7 @@ A modern, cross-platform geocaching management tool for **Linux**, **Windows** a
 - All tools open pre-filled with the currently selected cache's coordinates
 
 ### Language Support
-- 🌍 **Danish, English and French** built in
+- 🌍 **Danish, English, French and Portuguese** built in
 - 🔧 **Easy to add new languages** — copy one file, translate, done
 
 ---
@@ -427,6 +427,7 @@ opensak/
     ├── test_db.py                  # 13 tests
     ├── test_importer.py            # 11 tests
     ├── test_languages.py           # 3 tests
+    ├── test_gui.py                 # 2 tests
     └── test_filters.py             # 39 tests
 ```
 

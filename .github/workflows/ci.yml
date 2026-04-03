@@ -29,6 +29,11 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
+      - name: Install Qt dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-glx libxkbcommon-x11-0 libdbus-1-3 libxkbcommon-icccm4 libxkbcommon-util0 libxkbcommon0 libxkbcommon-private0 xvfb
+
       - name: Run tests
         run: |
           source .venv/bin/activate
