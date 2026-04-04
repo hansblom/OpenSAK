@@ -235,6 +235,10 @@ STRINGS: dict[str, str] = {
     "found_same_db_error":          "La base de données de référence ne peut pas être la même que la base de données active.",
     "found_running_file":           "Mise à jour à partir de : {name}…",
     "found_browse_title":           "Sélectionner la base de données de référence",
+    "found_info":                     "Cette fonction marque les caches comme <b>trouvés</b> dans la base active,\nen se basant sur les codes GC d'une base de référence (ex. 'Mes trouvailles').\n\nProcédure typique :\n1. Importez votre Pocket Query 'My Finds' dans une base séparée\n2. Passez à la base à mettre à jour (ex. 'Zélande')\n3. Sélectionnez 'Mes trouvailles' comme référence et cliquez sur Mettre à jour",
+    "found_active_db":                "Base active (à mettre à jour) :",
+    "found_completed":                "✓ Mise à jour terminée !",
+    "found_errors":                   "Erreurs :",
 
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "Nouvelle base de données",

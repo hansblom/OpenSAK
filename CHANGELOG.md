@@ -12,25 +12,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [1.4.3] — 2026
+## [1.4.4] — 2026-04-04
 ### Added
-- ** Security * better security and other minor fixes
+- **Czech translation** (`lang/cs.py`) — contributed by Michal Gavlík
+
+---
+
+## [1.4.3] — 2026
+### Fixed
+- Security improvements and minor bug fixes
+
+---
 
 ## [1.4.2] — 2026
-### Added
-- **Close issue #2 ** support GPX namespace groundspeak/cache/1/0 (My Finds PQ)
+### Fixed
+- GPX import: added support for `groundspeak/cache/1/0` namespace (used by My Finds PQ), resolving issue #2
 
 ---
 
 ## [1.4.1] — 2026
 ### Added
-- **Portuguese** (`Ctrl+T`) — Fabio have added Portugues and tests for translation completeness
+- **Portuguese translation** (`lang/pt.py`) — contributed by Fabio
+- Translation completeness tests added
 
 ---
 
 ## [1.4.0] — 2026
 ### Added
-- **Trip Planner** (`Ctrl+T`) — new dialog to plan a geocaching trip:
+- **Trip Planner** — new dialog to plan a geocaching trip:
   - **Radius tab** — select caches within a set distance from the active home point; sort by distance, difficulty, terrain, date or name
   - **Route tab (A→B→…)** — find caches along a multi-point route (up to 10 waypoints); caches sorted in driving order along the route
   - Route points can be typed in any coordinate format (DMM, DMS, DD) with live validation, or picked directly from saved home points
@@ -46,34 +55,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Distance column and trip planner update immediately when home point changes
 
 ### Fixed
-- Settings menu renamed from "Tools" / "Funktioner" to "Settings" / "Indstillinger" to avoid duplicate "Tools" entry in menu bar
+- Settings menu renamed from "Tools" to "Settings" to avoid duplicate "Tools" entry in menu bar
 
 ---
 
 ## [1.3.5] — 2026
 ### Added
-- **Corrected attributes in filter dialog**
+- Corrected coordinates now included as a filter option in the filter dialog
+
+---
 
 ## [1.3.4] — 2026
 ### Fixed
-- Import of large GSAK exports
+- Import of large GSAK exports no longer fails
+
+---
 
 ## [1.3.3] — 2026
 ### Fixed
-- D/T filter not displaying correctly
-- Resize and move of windows
+- D/T filter not displaying correctly on smaller screens
+- Filter dialog resize and move behaviour corrected
+
+---
 
 ## [1.3.2] — 2026
 ### Fixed
-- D/T filter not displaying correctly
-- Corrected Coordinate display
+- D/T filter display issue
+- Corrected coordinate display in detail panel
+
+---
 
 ## [1.3.1] — 2026
 ### Added
-- **Corrected Coordinates** — new option to add corrected coordinates to caches:
-  - Add corrected coordinate to a cache
-  - Show corrected waypoint on map
-  - Use corrected coordinate in GPS upload
+- **Corrected Coordinates** — add solved coordinates to mystery caches:
+  - Add corrected coordinate via right-click menu or detail panel
+  - Corrected waypoint shown on map with orange pin overlay
+  - Corrected coordinate used in GPS export
 
 ---
 
@@ -99,15 +116,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [1.2.0] — 2026
 ### Added
-- French language (`lang/fr.py`) — contributed by Pierre LEJEUNE (@theyoungstone)
+- **French translation** (`lang/fr.py`) — contributed by Pierre LEJEUNE (@theyoungstone)
 - `CONTRIBUTORS.md` — contributor credits
 
 ### Fixed
-- Version number in About dialog is now read dynamically from `__init__.py` — no longer hardcoded in translation files
+- Version number in About dialog now read dynamically from `__init__.py` — no longer hardcoded in translation files
 - Filter dialog now opens tall enough to show all options without manual resizing
 - GC code placeholder in filter dialog is now translated
 - Red "no device" hint text in GPS dialog now wraps correctly instead of being truncated
-- All hardcoded Danish strings in waypoint dialog replaced with `tr()` calls — labels, placeholders and checkboxes are now fully translated
+- All hardcoded Danish strings in waypoint dialog replaced with `tr()` calls
 - Cancel/Save buttons in waypoint dialog now translated correctly in all languages
 
 ### Changed
@@ -133,7 +150,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.2.0] — 2026
 ### Added
 - **Advanced filter dialog** with 3 tabs (General, Dates, Attributes)
-- **Filter toolbar** — 🔍 Filter (Ctrl+F) and ❌ Clear filter
+- **Filter toolbar** — 🔍 Filter (`Ctrl+F`) and ❌ Clear filter
 - **ROT13 hint decoding** — one click to decode / re-hide
 - **Search in logs** with real-time match highlighting
 - **Status icons** — ✅ found, ❌ DNF, 🔒 archived, ⚠️ unavailable

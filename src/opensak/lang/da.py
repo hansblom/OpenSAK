@@ -235,6 +235,10 @@ STRINGS: dict[str, str] = {
     "found_same_db_error":          "Reference databasen må ikke være den samme som den aktive database.",
     "found_running_file":           "Opdaterer fra: {name}…",
     "found_browse_title":           "Vælg reference database",
+    "found_info":                     "Denne funktion markerer caches som <b>fundet</b> i den aktive database,\nbaseret på GC koder fra en reference database (f.eks. 'Mine Fund').\n\nTypisk workflow:\n1. Importer din 'My Finds' Pocket Query i en separat database\n2. Skift til den database du vil opdatere (f.eks. 'Sjælland')\n3. Vælg 'Mine Fund' som reference og klik Opdater",
+    "found_active_db":                "Aktiv database (opdateres):",
+    "found_completed":                "✓ Opdatering fuldført!",
+    "found_errors":                   "Fejl:",
 
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "Ny database",

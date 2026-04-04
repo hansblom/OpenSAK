@@ -235,6 +235,10 @@ STRINGS: dict[str, str] = {
     "found_same_db_error":          "The reference database cannot be the same as the active database.",
     "found_running_file":           "Updating from: {name}…",
     "found_browse_title":           "Select reference database",
+    "found_info":                     "This function marks caches as <b>found</b> in the active database,\nbased on GC codes from a reference database (e.g. 'My Finds').\n\nTypical workflow:\n1. Import your 'My Finds' Pocket Query into a separate database\n2. Switch to the database you want to update (e.g. 'Zealand')\n3. Select 'My Finds' as reference and click Update",
+    "found_active_db":                "Active database (to update):",
+    "found_completed":                "✓ Update completed!",
+    "found_errors":                   "Errors:",
 
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "New database",

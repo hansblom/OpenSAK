@@ -58,14 +58,7 @@ class FoundUpdaterDialog(QDialog):
         layout.setSpacing(10)
 
         # ── Forklaring ────────────────────────────────────────────────────────
-        info = QLabel(
-            "Denne funktion markerer caches som <b>fundet</b> i den aktive database,\n"
-            "baseret på GC koder fra en reference database (f.eks. 'Mine Fund').\n\n"
-            "Typisk workflow:\n"
-            "1. Importer din 'My Finds' Pocket Query i en separat database\n"
-            "2. Skift til den database du vil opdatere (f.eks. 'Sjælland')\n"
-            "3. Vælg 'Mine Fund' som reference og klik Opdater"
-        )
+        info = QLabel(tr("found_info"))
         info.setWordWrap(True)
         info.setStyleSheet("color: #444; font-size: 11px;")
         layout.addWidget(info)
@@ -73,7 +66,7 @@ class FoundUpdaterDialog(QDialog):
         # ── Aktiv database ────────────────────────────────────────────────────
         manager = get_db_manager()
         active_name = manager.active.name if manager.active else "Ingen"
-        active_lbl = QLabel(f"<b>Aktiv database (opdateres):</b> {active_name}")
+        active_lbl = QLabel(f"<b>{tr('found_active_db')}</b> {active_name}")
         active_lbl.setStyleSheet("color: #1565c0;")
         layout.addWidget(active_lbl)
 
@@ -191,11 +184,11 @@ class FoundUpdaterDialog(QDialog):
         self._update_btn.setEnabled(True)
 
         lines = [
-            "✓ Opdatering fuldført!\n",
+            tr("found_completed") + "\n",
             str(result),
         ]
         if result.errors:
-            lines.append(f"\nFejl:")
+            lines.append(f"\n{tr('found_errors')}")
             for e in result.errors:
                 lines.append(f"  - {e}")
 
@@ -207,4 +200,4 @@ class FoundUpdaterDialog(QDialog):
     def _on_error(self, msg: str) -> None:
         self._progress.setVisible(False)
         self._update_btn.setEnabled(True)
-        self._log.setPlainText(f"✗ Fejl:\n{msg}")
+        self._log.setPlainText(f"✗ {tr('found_errors')}\n{msg}")
