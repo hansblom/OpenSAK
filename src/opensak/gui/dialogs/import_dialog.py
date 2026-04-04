@@ -135,15 +135,15 @@ class ImportDialog(QDialog):
         self._browse_btn.setEnabled(True)
 
         lines = [
-            f"✓ Import fuldført: {self._selected_path.name}",
-            f"",
-            f"  Nye caches:      {result.created}",
-            f"  Opdaterede:      {result.updated}",
-            f"  Waypoints:       {result.waypoints}",
-            f"  Sprunget over:   {result.skipped}",
+            tr("import_complete", name=self._selected_path.name),
+            "",
+            f"  {tr('import_new_caches'):<20} {result.created}",
+            f"  {tr('import_updated'):<20} {result.updated}",
+            f"  {tr('import_waypoints'):<20} {result.waypoints}",
+            f"  {tr('import_skipped'):<20} {result.skipped}",
         ]
         if result.errors:
-            lines.append(f"\n  Fejl ({len(result.errors)}):")
+            lines.append(f"\n  {tr('import_errors_header', count=len(result.errors))}")
             for e in result.errors[:10]:
                 lines.append(f"    - {e}")
 
@@ -158,4 +158,4 @@ class ImportDialog(QDialog):
         self._progress.setVisible(False)
         self._browse_btn.setEnabled(True)
         self._import_btn.setEnabled(True)
-        self._log.setPlainText(f"✗ Fejl under import:\n{msg}")
+        self._log.setPlainText(f"{tr('import_failed')}\n{msg}")
