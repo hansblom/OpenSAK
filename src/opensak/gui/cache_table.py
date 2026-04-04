@@ -52,6 +52,24 @@ def _get_active_columns() -> list[str]:
     return get_visible_columns()
 
 
+def _gc_sort_key(gc_code: str) -> str:
+    """Return a zero-padded sort key so GC codes sort numerically.
+
+    GC codes are alphanumeric (base-31), so pure alphabetical sorting gives
+    wrong order, e.g. GC1DCA before GC1D.  Zero-padding the suffix to a fixed
+    width produces correct ordering without needing a base-31 conversion.
+
+    Examples:
+        GC1D   → GC000000001D
+        GC1DCA → GC0000001DCA   (correctly sorts after GC1D)
+    """
+    if not gc_code:
+        return ""
+    upper = gc_code.upper()
+    suffix = upper[2:] if upper.startswith("GC") else upper
+    return "GC" + suffix.zfill(10)
+
+
 class CacheTableModel(QAbstractTableModel):
     """Qt table model backed by a list of Cache objects."""
 
@@ -245,6 +263,8 @@ class CacheTableModel(QAbstractTableModel):
             self._caches.sort(
                 key=lambda c: (c.name or "").lower(), reverse=reverse
             )
+        elif col == "gc_code":
+            self._caches.sort(key=lambda c: _gc_sort_key(c.gc_code or ""), reverse=reverse)
         else:
             self._caches.sort(
                 key=lambda c: (getattr(c, col, "") or "").lower()
