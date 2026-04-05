@@ -131,7 +131,7 @@ class Waypoint(Base):
     """
     __tablename__ = "waypoints"
     __table_args__ = (
-        UniqueConstraint("cache_id", "prefix", name="uq_waypoint_cache_prefix"),
+        UniqueConstraint("cache_id", "prefix", "name", name="uq_waypoint_cache_prefix_name"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
