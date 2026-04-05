@@ -2,9 +2,12 @@
 src/opensak/coords.py — Coordinate format conversion utilities.
 
 Supported formats:
-  DD   — Decimal Degrees:        55.78750, 12.41667
-  DMM  — Degrees Decimal Minutes: N55 47.250 E012 25.000
-  DMS  — Degrees Minutes Seconds: N55° 47' 15" E012° 25' 00"
+  DD   — Decimal Degrees:          55.78750, 12.41667
+  DMM  — Degrees Decimal Minutes:  N55 47.250 E012 25.000
+  DMS  — Degrees Minutes Seconds:  N55° 47' 15" E012° 25' 00"
+
+Parse also accepts the geocaching.com copy-paste format:
+  N 34° 58.088' E 034° 03.281'   (DMM with degree sign and apostrophe)
 """
 
 from __future__ import annotations
@@ -65,24 +68,48 @@ def format_coords(lat: float, lon: float, fmt: str) -> str:
     return _dd_to_dmm(lat, lon)   # default: DMM
 
 
-# ── Parsing (for the converter dialog input) ──────────────────────────────────
+# ── Parsing ───────────────────────────────────────────────────────────────────
 
 def parse_coords(text: str) -> tuple[float, float] | None:
     """
-    Try to parse a coordinate string in any of the three supported formats.
+    Try to parse a coordinate string in any supported format.
     Returns (lat, lon) as decimal degrees, or None if parsing fails.
+
+    Accepted formats
+    ----------------
+    DD  :  55.78750, 12.41667
+    DMM :  N55 47.250 E012 25.000
+    DMM°:  N 34° 58.088' E 034° 03.281'   (geocaching.com copy-paste)
+    DMS :  N55° 47' 15.00" E012° 25' 00.00"
     """
     import re
     text = text.strip()
 
-    # DD: "55.78750, 12.41667" or "55.78750 12.41667"
+    # ── DD: "55.78750, 12.41667" or "55.78750 12.41667" ──────────────────────
     m = re.match(
         r'^([+-]?\d+\.\d+)[,\s]+([+-]?\d+\.\d+)$', text
     )
     if m:
         return float(m.group(1)), float(m.group(2))
 
-    # DMM: "N55 47.250 E012 25.000" / "S12 30.500 W077 02.300"
+    # ── DMM°: "N 34° 58.088' E 034° 03.281'" (geocaching.com format) ─────────
+    # Grads-tegn efter grader, apostrof efter minutter, mellemrum tilladt overalt
+    m = re.match(
+        r'^([NSns])\s*(\d{1,3})\s*°\s*(\d+(?:\.\d+)?)\s*[\'′]\s*'
+        r'([EWew])\s*(\d{1,3})\s*°\s*(\d+(?:\.\d+)?)\s*[\'′]\s*$',
+        text
+    )
+    if m:
+        lat_h, lat_d, lat_m, lon_h, lon_d, lon_m = m.groups()
+        lat = int(lat_d) + float(lat_m) / 60
+        lon = int(lon_d) + float(lon_m) / 60
+        if lat_h.upper() == "S":
+            lat = -lat
+        if lon_h.upper() == "W":
+            lon = -lon
+        return lat, lon
+
+    # ── DMM: "N55 47.250 E012 25.000" ────────────────────────────────────────
     m = re.match(
         r'^([NSns])\s*(\d{1,3})\s+(\d+\.\d+)\s+([EWew])\s*(\d{1,3})\s+(\d+\.\d+)$',
         text
@@ -97,7 +124,7 @@ def parse_coords(text: str) -> tuple[float, float] | None:
             lon = -lon
         return lat, lon
 
-    # DMS: "N55° 47' 15.00" E012° 25' 00.00""
+    # ── DMS: "N55° 47' 15.00" E012° 25' 00.00"" ──────────────────────────────
     m = re.match(
         r'^([NSns])\s*(\d{1,3})[°\s]\s*(\d{1,2})[\'′\s]\s*(\d+(?:\.\d+)?)["\s]*'
         r'\s+([EWew])\s*(\d{1,3})[°\s]\s*(\d{1,2})[\'′\s]\s*(\d+(?:\.\d+)?)["\s]*$',

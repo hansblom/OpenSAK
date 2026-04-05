@@ -12,9 +12,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.5.2] — 2026-04-05
+### Fixed
+- **Coordinate parser** now accepts the geocaching.com copy-paste format `N 34° 58.088' E 034° 03.281'` (DMM with degree sign and apostrophe) — no manual editing required (fixes #9)
+- **Edit cache dialog** — coordinates are now displayed in the user's chosen format (DMM/DMS/DD) instead of raw decimal degrees; accepts all supported formats including paste from geocaching.com
+
+### Files changed
+- `src/opensak/coords.py`
+- `src/opensak/gui/dialogs/waypoint_dialog.py`
+
+---
+
 ## [1.5.1] — 2026-04-05
 ### Added
-- **Fix: import GPX from GSAK** — fis issue with multiple WP
+- **Fix: import GPX from GSAK** — fix issue with multiple WP
 
 ---
 
