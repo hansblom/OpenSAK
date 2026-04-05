@@ -12,6 +12,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.5.1] — 2026-04-05
+### Added
+- **Fix: import GPX from GSAK** — fis issue with multiple WP
+
+---
+
 ## [1.5.0] — 2026-04-05
 ### Added
 - **Trip Planner: Save to database** — export selected trip caches directly to a new or existing OpenSAK database:
