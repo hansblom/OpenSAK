@@ -12,6 +12,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.5.0] — 2026-04-05
+### Added
+- **Trip Planner: Save to database** — export selected trip caches directly to a new or existing OpenSAK database:
+  - Choose between creating a new `.db` file or adding to an existing one
+  - Duplicate GC codes are automatically skipped; a summary shows how many were added vs. skipped
+  - File dialog opens in the same folder as the active database for easy access
+- **Trip Planner: Live map updates** — the map preview now refreshes automatically whenever the cache selection changes (count, filters, radius, route), no need to close and reopen the map
+
+### Fixed
+- **Trip Planner: Map preview** is now a fully interactive, independent window — zoom, pan and cache popups work correctly; the window no longer stays locked behind the Trip Planner dialog
+- **Trip Planner** is now non-blocking (`show()` instead of `exec()`) so the map window and the planner can be used side by side
+
+### Changed
+- All five language files updated with new Trip Planner strings (`da`, `en`, `fr`, `pt`, `cs`)
+
+### Files changed
+- `src/opensak/gui/dialogs/trip_dialog.py`
+- `src/opensak/gui/mainwindow.py`
+- `src/opensak/lang/da.py`, `en.py`, `fr.py`, `pt.py`, `cs.py`
+
+---
+
 ## [1.4.8] — 2026-04-04
 ### Added
 - **Attributes** updated thanks to Pierre Lejeune

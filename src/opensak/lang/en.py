@@ -686,6 +686,19 @@ STRINGS: dict[str, str] = {
     "trip_map_preview_title":                  "Trip Planner — Map Preview",
     "trip_map_preview_info":                   "{count} caches shown — trip planner remains open",
 
+    # Trip planner — save to database
+    "trip_btn_save_db":                        "🗄️  Save to database…",
+    "trip_btn_save_db_tooltip":                "Save the selected trip caches to a new or existing OpenSAK database",
+    "trip_db_choice_title":                    "Save to database",
+    "trip_db_choice_label":                    "Choose destination:",
+    "trip_db_choice_new":                      "Create new database",
+    "trip_db_choice_existing":                 "Add to existing database",
+    "trip_db_new_title":                       "Save new database",
+    "trip_db_open_title":                      "Open existing database",
+    "trip_db_filter":                          "OpenSAK databases (*.db);;All files (*)",
+    "trip_db_saved_title":                     "Saved",
+    "trip_db_saved_msg":                       "Added {added} caches, skipped {skipped} (already existed) — {path}",
+
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "General",
     "settings_tab_geocaching":      "Geocaching.com",

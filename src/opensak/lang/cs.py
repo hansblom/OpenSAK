@@ -682,6 +682,19 @@ STRINGS: dict[str, str] = {
     "trip_map_preview_title":                  "Plánovač výletu — náhled mapy",
     "trip_map_preview_info":                   "Zobrazeno {count} keší — plánovač výletu zůstává otevřený",
 
+    # Plánovač výletu — uložit do databáze
+    "trip_btn_save_db":                        "🗄️  Uložit do databáze…",
+    "trip_btn_save_db_tooltip":                "Uložit vybrané keše výletu do nové nebo existující databáze OpenSAK",
+    "trip_db_choice_title":                    "Uložit do databáze",
+    "trip_db_choice_label":                    "Vyberte cíl:",
+    "trip_db_choice_new":                      "Vytvořit novou databázi",
+    "trip_db_choice_existing":                 "Přidat do existující databáze",
+    "trip_db_new_title":                       "Uložit novou databázi",
+    "trip_db_open_title":                      "Otevřít existující databázi",
+    "trip_db_filter":                          "Databáze OpenSAK (*.db);;Všechny soubory (*)",
+    "trip_db_saved_title":                     "Uloženo",
+    "trip_db_saved_msg":                       "Přidáno {added} keší, přeskočeno {skipped} (již existují) — {path}",
+
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "Obecné",
     "settings_tab_geocaching":      "Geocaching.com",

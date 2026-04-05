@@ -644,8 +644,11 @@ class MainWindow(QMainWindow):
             for i in range(self._cache_table.row_count())
         ]
         caches = [c for c in caches if c is not None]
-        dlg = TripPlannerDialog(self, caches=caches)
-        dlg.exec()
+        # show() i stedet for exec() — ikke-modal så kortvinduet kan få fokus
+        self._trip_planner_win = TripPlannerDialog(self, caches=caches)
+        self._trip_planner_win.show()
+        self._trip_planner_win.raise_()
+        self._trip_planner_win.activateWindow()
 
     def _open_found_updater(self) -> None:
         from opensak.gui.dialogs.found_dialog import FoundUpdaterDialog

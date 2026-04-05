@@ -686,6 +686,19 @@ STRINGS: dict[str, str] = {
     "trip_map_preview_title":                  "Planificateur — Aperçu carte",
     "trip_map_preview_info":                   "{count} caches affichées — le planificateur reste ouvert",
 
+    # Planificateur — enregistrer dans une base de données
+    "trip_btn_save_db":                        "🗄️  Enregistrer dans une base…",
+    "trip_btn_save_db_tooltip":                "Enregistrer les caches sélectionnées dans une base de données OpenSAK nouvelle ou existante",
+    "trip_db_choice_title":                    "Enregistrer dans une base de données",
+    "trip_db_choice_label":                    "Choisir la destination :",
+    "trip_db_choice_new":                      "Créer une nouvelle base de données",
+    "trip_db_choice_existing":                 "Ajouter à une base existante",
+    "trip_db_new_title":                       "Enregistrer une nouvelle base de données",
+    "trip_db_open_title":                      "Ouvrir une base de données existante",
+    "trip_db_filter":                          "Bases OpenSAK (*.db);;Tous les fichiers (*)",
+    "trip_db_saved_title":                     "Enregistré",
+    "trip_db_saved_msg":                       "{added} caches ajoutées, {skipped} ignorées (déjà présentes) — {path}",
+
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "Général",
     "settings_tab_geocaching":      "Geocaching.com",

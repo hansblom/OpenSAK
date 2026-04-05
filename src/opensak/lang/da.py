@@ -686,6 +686,19 @@ STRINGS: dict[str, str] = {
     "trip_map_preview_title":                  "Turplanlægger — Kortvisning",
     "trip_map_preview_info":                   "{count} caches vist — turplanlæggeren forbliver åben",
 
+    # Turplanlægger — gem i database
+    "trip_btn_save_db":                        "🗄️  Gem i database…",
+    "trip_btn_save_db_tooltip":                "Gem de valgte tur-caches i en ny eller eksisterende OpenSAK database",
+    "trip_db_choice_title":                    "Gem i database",
+    "trip_db_choice_label":                    "Vælg destination:",
+    "trip_db_choice_new":                      "Opret ny database",
+    "trip_db_choice_existing":                 "Føj til eksisterende database",
+    "trip_db_new_title":                       "Gem ny database",
+    "trip_db_open_title":                      "Åbn eksisterende database",
+    "trip_db_filter":                          "OpenSAK databaser (*.db);;Alle filer (*)",
+    "trip_db_saved_title":                     "Gemt",
+    "trip_db_saved_msg":                       "Tilføjet {added} caches, sprunget {skipped} over (fandtes allerede) — {path}",
+
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "Generelt",
     "settings_tab_geocaching":      "Geocaching.com",
