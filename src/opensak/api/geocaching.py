@@ -35,6 +35,7 @@ import urllib.request
 from pathlib import Path
 from typing import Optional, List
 from enum import IntEnum
+from opensak.utils.types import LogType
 from opensak.utils.utils import validate_gc_code
 
 logger = logging.getLogger(__name__)
@@ -51,14 +52,6 @@ GC_API_BASE     = "https://api.groundspeak.com/v1"
 GC_REDIRECT_PORT = 7654
 GC_REDIRECT_URI = f"http://localhost:{GC_REDIRECT_PORT}/callback"
 GC_SCOPES       = "*"   # Fuld adgang — justeres evt. ved godkendelse
-
-# Cache log types
-class LogType(IntEnum):
-    FOUND = 2
-    DNF = 3
-    NOTE = 4
-    ARCHIVE = 5
-
 
 # ── Token håndtering med cache ────────────────────────────────────────────────
 

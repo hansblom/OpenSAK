@@ -1,3 +1,10 @@
+"""
+src/opensak/doctor.py — System diagnostic tool for environment and dependency validation.
+
+Checks Python version, virtual environment status, and required dependencies.
+Verifies configuration directory access and suggests fixes for missing components.
+"""
+
 from __future__ import annotations
 
 import sys

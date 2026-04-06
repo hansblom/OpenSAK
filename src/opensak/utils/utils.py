@@ -1,4 +1,13 @@
+"""
+src/opensak/utils/types.py — Utility functions for data validation and file type identification.
+
+Provides regex-based validation for Geocaching GC codes and format constraints.
+Maps file system paths to the internal ImportType Enum for secure file processing.
+"""
+
 import re
+from pathlib import Path
+from opensak.utils.types import ImportType
 
 def validate_gc_code(gc_code: str) -> None:
     """Validate geocache code format (GC prefix, 3-7 chars, restricted letters)."""
@@ -7,3 +16,16 @@ def validate_gc_code(gc_code: str) -> None:
             f"Invalid gc_code format: {gc_code}. Expected GC prefix + 1-7 chars "
             "with letters A-Z excluding O, L, S, and digits 0-9."
         )
+
+def get_import_type(path: Path) -> ImportType:
+    """Identifies the ImportType based on file extension."""
+    suffix = path.suffix.lower()
+    mapping = {
+        ".gpx": ImportType.GPX,
+        ".zip": ImportType.ZIP,
+    }
+    
+    if suffix not in mapping:
+        raise ValueError(f"Unsupported file format: {suffix}")
+        
+    return mapping[suffix]

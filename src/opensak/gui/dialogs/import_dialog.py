@@ -30,20 +30,31 @@ class ImportWorker(QThread):
         try:
             from opensak.db.database import init_db, get_session
             from opensak.importer import import_gpx, import_zip
+            from opensak.utils.utils import get_import_type, ImportType
 
-            # Ensure DB is initialised in this thread too
+            import_type: ImportType = get_import_type(self.path)
+
             init_db()
 
             with get_session() as session:
-                if self.path.suffix.lower() == ".zip":
-                    result = import_zip(self.path, session,
-                                        progress_cb=self.progress.emit)
-                else:
-                    result = import_gpx(self.path, session,
-                                        progress_cb=self.progress.emit)
+                importers = {
+                    ImportType.GPX: import_gpx,
+                    ImportType.ZIP: import_zip,
+                }
+
+                import_func = importers[import_type]
+                    
+                result = import_func(
+                    self.path, 
+                    session, 
+                    progress_cb=self.progress.emit
+                )
 
             self.finished.emit(result)
-        except Exception as e:
+                
+        except ValueError as e:
+            self.error.emit(str(e))
+        except Exception:
             import traceback
             self.error.emit(traceback.format_exc())
 
