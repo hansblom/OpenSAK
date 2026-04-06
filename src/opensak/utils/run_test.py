@@ -1,3 +1,10 @@
+"""
+src/opensak/utils/run_tests.py — CLI wrapper for the pytest test suite.
+
+Collects and executes all tests located in the project's tests directory.
+Passes additional command-line arguments directly to the pytest engine.
+"""
+
 import pytest
 import sys
 

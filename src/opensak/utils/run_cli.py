@@ -1,4 +1,9 @@
-# src/opensak/utils/run_cli.py
+"""
+src/opensak/utils/run_cli.py — Dynamic entry point loader for the main CLI application.
+
+Locates and executes the root run.py script using low-level importlib utilities.
+Exposes the main execution function to ensure consistent repository-wide access.
+"""
 
 from pathlib import Path
 import importlib.util
