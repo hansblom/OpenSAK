@@ -197,7 +197,6 @@ STRINGS: dict[str, str] = {
     "db_activate":                  "Ativar",
     "db_active_marker":             "(ativa)",
     "db_delete_confirm_title":      "Eliminar base de dados",
-    "db_delete_confirm_msg":        "Tem a certeza que deseja eliminar a base de dados '{name}'?\nO ficheiro será eliminado permanentemente.",
     "db_cannot_delete_active":      "A base de dados ativa não pode ser eliminada.\nMude para outra base de dados primeiro.",
 
     # ── Found updater dialog ──────────────────────────────────────────────────
@@ -227,15 +226,6 @@ STRINGS: dict[str, str] = {
     "wp_val_gc_required":           "O Código GC é obrigatório.",
     "wp_val_gc_invalid":            "O Código GC deve começar por 'GC'.",
     "wp_val_name_required":         "O nome é obrigatório.",
-
-    # ── Import dialog ─────────────────────────────────────────────────────────
-    "import_select_file_label":     "Selecione um ficheiro GPX ou ficheiro ZIP de Pocket Query:",
-    "import_no_file":               "(nenhum ficheiro selecionado)",
-    "import_browse_title":          "Selecionar ficheiro GPX ou ZIP",
-    "import_file_filter":           "Ficheiros Geocaching (*.gpx *.zip);;Ficheiros GPX (*.gpx);;Ficheiros ZIP (*.zip)",
-    "import_running_file":          "Importing {name}…",
-    "import_log_placeholder":       "O resultado da importação será mostrado aqui…",
-    "import_again":                 "Importar novamente",
 
     # ── GPS dialog ────────────────────────────────────────────────────────────
     "gps_delete_cb_tooltip":        "Apaga todos os ficheiros .gpx na pasta Garmin/GPX do dispositivo\nanter de carregar o novo ficheiro. Aplica-se apenas ao carregamento direto para GPS.",
@@ -376,9 +366,7 @@ STRINGS: dict[str, str] = {
 
     # ── Toolbar extras ────────────────────────────────────────────────────────
     "toolbar_fit_all":              "Ajustar todas",
-    "toolbar_home":                 "Início",
     "toolbar_fit_all_tooltip":      "Ajustar mapa a todas as caches",
-    "toolbar_home_tooltip":         "Ir para as coordenadas de casa",
 
     # ── Cache table columns ───────────────────────────────────────────────────
     "col_status_icon":  "Ícone de estado",
@@ -627,7 +615,7 @@ STRINGS: dict[str, str] = {
     "toolbar_trip":                 "Planeador de Viagem",
     "toolbar_trip_tooltip":         "Planear uma viagem de geocaching",
     "toolbar_home":                 "Início",
-    "toolbar_home_tooltip":         "Mover mapa para o ponto de casa",
+    "toolbar_home_tooltip":         "Ir para as coordenadas de casa",
 
 
     "trip_center_info":                        "📍 O raio é calculado a partir do seu ponto central (definido nas Configurações). Defina o raio como 0 para ver todas as caches sem filtragem por distância.",
