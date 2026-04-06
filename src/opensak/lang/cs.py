@@ -1,8 +1,8 @@
 """
-src/opensak/lang/en.py — English language file for OpenSAK.
+src/opensak/lang/cs.py — Czech language file for OpenSAK.
 
 All UI strings collected in one place.
-Copy this file from 'en.py' to a new file (e.g., en.py) and translate the values.
+Copy this file from 'cs.py' to a new file (e.g., sk.py) and translate the values.
 The keys (left side) must NEVER be changed — they are used in the code.
 """
 
