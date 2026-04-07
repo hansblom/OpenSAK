@@ -116,6 +116,23 @@ STRINGS: dict[str, str] = {
     "import_running":               "Importerar…",
     "import_done":                  "Import färdig: {count} cacher importerade",
     "import_error":                 "Import felade: {error}",
+    "import_complete":              "✓ Import complete: {name}",
+    "import_new_caches":            "New caches:",
+    "import_updated":               "Updated:",
+    "import_waypoints":             "Waypoints:",
+    "import_skipped":               "Skipped:",
+    "import_errors_header":         "Errors ({count}):",
+    "import_failed":                "✗ Import failed:",
+    "import_again":                 "Import again",
+    "import_select_file_label":     "Select a GPX file or Pocket Query ZIP file:",
+    "import_no_file":               "No file selected",
+    "import_browse_title":          "Select GPX or ZIP file",
+    "import_file_filter":           "GPX and ZIP files (*.gpx *.zip);;All files (*)",
+    "import_running_file":          "Importing {name}…",
+    "import_progress":              "Processing caches: {count}…",
+    "import_saving":               "Saving to database…",
+    "import_table_loaded":         "✓ {count} caches loaded — click a cache to view on map",
+    "import_log_placeholder":       "Import results will appear here…",
 
     # ── Filter dialog ─────────────────────────────────────────────────────────
     "filter_dialog_title":          "Sätt filter",
@@ -180,7 +197,6 @@ STRINGS: dict[str, str] = {
     "db_activate":                  "Aktivera",
     "db_active_marker":             "(aktiv)",
     "db_delete_confirm_title":      "Ta bort databas",
-    "db_delete_confirm_msg":        "Är du säker på att du vill ta bort databasen '{name}'?\nFilen kommer att raderas.",
     "db_cannot_delete_active":      "Den aktiva kan inte raderas.\nByt till en annan databas först.",
 
     # ── Found updater dialog ──────────────────────────────────────────────────
@@ -199,7 +215,7 @@ STRINGS: dict[str, str] = {
     "about_text":
         "<h3>OpenSAK {version}</h3>"
         "<p>Ett open source geocaching management verktyg "
-        "för Linux and Windows.</p>"
+        "för Linux, Mac and Windows.</p>"
         "<p>Byggt med Python och PySide6.</p>"
         "<p><a href='https://github.com/AgreeDK/opensak'>"
         "github.com/AgreeDK/opensak</a></p>",
@@ -210,15 +226,6 @@ STRINGS: dict[str, str] = {
     "wp_val_gc_required":           "GC kod krävs.",
     "wp_val_gc_invalid":            "GC Code måste börja med 'GC'.",
     "wp_val_name_required":         "Namn krävs.",
-
-    # ── Import dialog ─────────────────────────────────────────────────────────
-    "import_select_file_label":     "Välj en GPX fil eller Pocket Query ZIP fil:",
-    "import_no_file":               "(ingen fil vald)",
-    "import_browse_title":          "Välj GPX eller ZIP fil",
-    "import_file_filter":           "Geocaching filer (*.gpx *.zip);;GPX filer (*.gpx);;ZIP files (*.zip)",
-    "import_running_file":          "Importerar {name}…",
-    "import_log_placeholder":       "Importerat resultat visas här…",
-    "import_again":                 "Importera igen",
 
     # ── GPS dialog ────────────────────────────────────────────────────────────
     "gps_delete_cb_tooltip":        "Tar bort alla .gpx filer i Garmin/GPX foldern på enheten\ninnan ny fil laddas upp. Gäller endast direkt till GPS.",
@@ -235,10 +242,15 @@ STRINGS: dict[str, str] = {
     "found_same_db_error":          "Referensdatabasen kan inte vara samma som den aktiva.",
     "found_running_file":           "Updaterar från: {name}…",
     "found_browse_title":           "Välj referensdatabas",
+    "found_info":                    "Denna funktion flaggar cacher som <b>hittade</b> i den activa databasen,\nbaserat på GC coderna från en referens databass (t.e.x. 'Mina hittade').\n\nTypisk arbetsordning:\n1. Importera 'Mina hittade' Pocket Query till en separat database\n2. Byt till databasen som du vill uppdatera (t.e.x. 'Uppland')\n3. Välj 'Min hittade' som referens och klicka Uppdatera",
+    "found_active_db":                "Activ databas (uppdatera):",
+    "found_completed":                "✓ Uppdatering färdig!",
+    "found_errors":                   "Fel:",
 
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "Ny databas",
     "db_name_label":                "Namn:",
+    "db_new_info":                  "Databasen sparas automatiskt i mappen app.\nDu kan ändra målet nedan (frivilligt).",
     "db_default_path":              "(standard plats)",
     "db_name_required":             "Ange ett namn för den nya databasen.",
     "db_browse_title":              "Välj plats",
@@ -325,7 +337,7 @@ STRINGS: dict[str, str] = {
     "filter_saved_title":           "Sparat",
     "filter_saved_msg":             "Filter '{name}' har sparats.",
     "filter_delete_title":          "Ta bort profil",
-    "filter_delete_msg":            "ta bort filter profil '{name}'?",
+    "filter_delete_msg":            "Ta bort filter profil '{name}'?",
     "filter_load_error":            "Kunde inte ladda profil:\n{error}",
     # ── Cache detail panel ────────────────────────────────────────────────────
     "detail_select_cache":          "Välj en cache från listan",
@@ -354,9 +366,8 @@ STRINGS: dict[str, str] = {
 
     # ── Toolbar extras ────────────────────────────────────────────────────────
     "toolbar_fit_all":              "Få plats med alla",
-    "toolbar_home":                 "Hem",
     "toolbar_fit_all_tooltip":      "Zooma kartan till alla cacher",
-    "toolbar_home_tooltip":         "Gå till hemkoordinaterna",
+    
     # ── Cache table columns ───────────────────────────────────────────────────
     "col_status_icon":  "Status ikon",
     "col_gc_code":      "GC Kod",
@@ -666,6 +677,19 @@ STRINGS: dict[str, str] = {
     "trip_btn_preview_map_tooltip":            "Öppna valda cacher på en interaktiv karta",
     "trip_map_preview_title":                  "Ruttplanerare — Förhandsvisning",
     "trip_map_preview_info":                   "{count} cacher visas — ruttplaneraren hålls öppen",
+    
+    # Trip planner — save to database
+    "trip_btn_save_db":                        "🗄️  Spara till databas…",
+    "trip_btn_save_db_tooltip":                "Spara den valda rutten till en ny eller en existerande OpenSAK databas",
+    "trip_db_choice_title":                    "Spara till databas",
+    "trip_db_choice_label":                    "Välj destination:",
+    "trip_db_choice_new":                      "Skapa ny databas",
+    "trip_db_choice_existing":                 "Addera till en existrande databas",
+    "trip_db_new_title":                       "Spara ny databas",
+    "trip_db_open_title":                      "Öppna en existerande databas",
+    "trip_db_filter":                          "OpenSAK databaser (*.db);;Alla filer (*)",
+    "trip_db_saved_title":                     "Sparad",
+    "trip_db_saved_msg":                       "Lade till {added} cacher, hoppade över {skipped} (fanns redan) — {path}",
 
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "Allmänt",
