@@ -12,6 +12,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.6.4] — 2026-04-06
+### Fixed
+- **"Fix: import of GPX file from gc.com with duplicated logs close issue #19 "**
+
+---
+
 ## [1.6.3] — 2026-04-06
 ### Fixed
 - **"Fix: Logs not displayed on cache page, close issue #18 "**
