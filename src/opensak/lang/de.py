@@ -619,7 +619,7 @@ STRINGS: dict[str, str] = {
 
 
     "trip_center_info":                        "📍 Der Radius wird von deinem Mittelpunkt aus berechnet (festgelegt in den Einstellungen). Stelle den Radius auf 0 ein, um alle Caches ohne Entfernungsfilter anzuzeigen.",
-    "trip_found_hint":                         "Voraussetzung ist, dass Sie die Option \"Funde aktualisieren\" (Menü „Tools“) ausgeführt haben, damit die gefundenen Caches korrekt markiert werden."
+    "trip_found_hint":                         "Voraussetzung ist, dass Sie die Option \"Funde aktualisieren\" (Menü „Tools“) ausgeführt haben, damit die gefundenen Caches korrekt markiert werden.",
     "trip_no_center_warning":                  "⚠️  Der Mittelpunkt ist nicht festgelegt – gehe zu Einstellungen und gib deinen Startpunkt ein oder stelle den Radius auf 0 ein.",
 
 
