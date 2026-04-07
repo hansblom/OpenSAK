@@ -12,6 +12,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.7.0] — 2026-04-07
+### Fixed
+- **""Add: Swedish language (se) to AVAILABLE_LANGUAGES""**
+
+---
+
 ## [1.6.5] — 2026-04-07
 ### Fixed
 - **"Fix: hardcoded dansih text in DB dialog close issue #28 "**
