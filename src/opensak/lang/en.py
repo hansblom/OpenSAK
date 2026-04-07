@@ -129,6 +129,9 @@ STRINGS: dict[str, str] = {
     "import_browse_title":          "Select GPX or ZIP file",
     "import_file_filter":           "GPX and ZIP files (*.gpx *.zip);;All files (*)",
     "import_running_file":          "Importing {name}…",
+    "import_progress":              "Processing caches: {count}…",
+    "import_saving":               "Saving to database…",
+    "import_table_loaded":         "✓ {count} caches loaded — click a cache to view on map",
     "import_log_placeholder":       "Import results will appear here…",
 
     # ── Filter dialog ─────────────────────────────────────────────────────────
@@ -194,7 +197,6 @@ STRINGS: dict[str, str] = {
     "db_activate":                  "Activate",
     "db_active_marker":             "(active)",
     "db_delete_confirm_title":      "Delete database",
-    "db_delete_confirm_msg":        "Are you sure you want to delete the database '{name}'?\nThe file will be permanently deleted.",
     "db_cannot_delete_active":      "The active database cannot be deleted.\nSwitch to another database first.",
 
     # ── Found updater dialog ──────────────────────────────────────────────────
@@ -225,15 +227,6 @@ STRINGS: dict[str, str] = {
     "wp_val_gc_invalid":            "GC Code must start with 'GC'.",
     "wp_val_name_required":         "Name is required.",
 
-    # ── Import dialog ─────────────────────────────────────────────────────────
-    "import_select_file_label":     "Select a GPX file or Pocket Query ZIP file:",
-    "import_no_file":               "(no file selected)",
-    "import_browse_title":          "Select GPX or ZIP file",
-    "import_file_filter":           "Geocaching files (*.gpx *.zip);;GPX files (*.gpx);;ZIP files (*.zip)",
-    "import_running_file":          "Importing {name}…",
-    "import_log_placeholder":       "Import result will be shown here…",
-    "import_again":                 "Import again",
-
     # ── GPS dialog ────────────────────────────────────────────────────────────
     "gps_delete_cb_tooltip":        "Deletes all .gpx files in the Garmin/GPX folder on the device\nbefore uploading the new file. Only applies to direct GPS upload.",
     "gps_log_placeholder":          "Status will be shown here…",
@@ -257,6 +250,7 @@ STRINGS: dict[str, str] = {
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "New database",
     "db_name_label":                "Name:",
+    "db_new_info":                  "The database is saved automatically in the app folder.\nYou can change the location below (optional).",
     "db_default_path":              "(default location)",
     "db_name_required":             "Please enter a name for the database.",
     "db_browse_title":              "Select location",
@@ -372,9 +366,7 @@ STRINGS: dict[str, str] = {
 
     # ── Toolbar extras ────────────────────────────────────────────────────────
     "toolbar_fit_all":              "Fit all",
-    "toolbar_home":                 "Home",
     "toolbar_fit_all_tooltip":      "Zoom map to all caches",
-    "toolbar_home_tooltip":         "Go to home coordinates",
 
     # ── Cache table columns ───────────────────────────────────────────────────
     "col_status_icon":  "Status icon",
@@ -685,6 +677,19 @@ STRINGS: dict[str, str] = {
     "trip_btn_preview_map_tooltip":            "Open selected caches on an interactive map",
     "trip_map_preview_title":                  "Trip Planner — Map Preview",
     "trip_map_preview_info":                   "{count} caches shown — trip planner remains open",
+
+    # Trip planner — save to database
+    "trip_btn_save_db":                        "🗄️  Save to database…",
+    "trip_btn_save_db_tooltip":                "Save the selected trip caches to a new or existing OpenSAK database",
+    "trip_db_choice_title":                    "Save to database",
+    "trip_db_choice_label":                    "Choose destination:",
+    "trip_db_choice_new":                      "Create new database",
+    "trip_db_choice_existing":                 "Add to existing database",
+    "trip_db_new_title":                       "Save new database",
+    "trip_db_open_title":                      "Open existing database",
+    "trip_db_filter":                          "OpenSAK databases (*.db);;All files (*)",
+    "trip_db_saved_title":                     "Saved",
+    "trip_db_saved_msg":                       "Added {added} caches, skipped {skipped} (already existed) — {path}",
 
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "General",

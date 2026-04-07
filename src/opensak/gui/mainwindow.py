@@ -435,30 +435,53 @@ class MainWindow(QMainWindow):
 
         return fs
 
+    # ── Helpers ───────────────────────────────────────────────────────────────
+
+    def _load_full_cache(self, gc_code: str):
+        """
+        Indlæs en enkelt cache fra DB med alle relationer eager-loaded.
+
+        apply_filters() bruger noload() på logs/waypoints/user_note for
+        performance ved store databaser. Denne hjælper bruges når brugeren
+        vælger en cache, så detaljepanelet altid får komplette data.
+        """
+        from opensak.db.models import Cache as CacheModel
+        from sqlalchemy.orm import joinedload
+        with get_session() as session:
+            return session.query(CacheModel).options(
+                joinedload(CacheModel.logs),
+                joinedload(CacheModel.attributes),
+                joinedload(CacheModel.waypoints),
+                joinedload(CacheModel.user_note),
+            ).filter_by(gc_code=gc_code).first()
+
     # ── Slots ─────────────────────────────────────────────────────────────────
 
     def _on_cache_selected(self, cache: Cache) -> None:
-        self._detail_panel.show_cache(cache)
-        self._map_widget.pan_to_cache(cache.gc_code)
+        """Kaldes når brugeren klikker på en cache i tabellen."""
+        # Genindlæs cachen med alle relationer (logs, waypoints osv.)
+        # da apply_filters() bruger noload() på disse for performance.
+        full = self._load_full_cache(cache.gc_code)
+        if not full:
+            return
+        self._detail_panel.show_cache(full)
+        self._map_widget.pan_to_cache(full.gc_code)
         self._act_wp_edit.setEnabled(True)
         self._act_wp_delete.setEnabled(True)
-        if cache.latitude and cache.longitude:
+        if full.latitude and full.longitude:
             self._statusbar.showMessage(
-                f"{cache.gc_code} — {cache.name} "
-                f"({cache.latitude:.5f}, {cache.longitude:.5f})"
+                f"{full.gc_code} — {full.name} "
+                f"({full.latitude:.5f}, {full.longitude:.5f})"
             )
 
     def _on_map_cache_selected(self, gc_code: str) -> None:
-        """Called when a pin is clicked on the map."""
-        from opensak.db.database import get_session
-        from opensak.db.models import Cache as CacheModel
-        with get_session() as session:
-            cache = session.query(CacheModel).filter_by(gc_code=gc_code).first()
-            if cache:
-                self._detail_panel.show_cache(cache)
-                self._statusbar.showMessage(
-                    f"{cache.gc_code} — {cache.name}"
-                )
+        """Kaldes når brugeren klikker på en pin på kortet."""
+        full = self._load_full_cache(gc_code)
+        if full:
+            self._detail_panel.show_cache(full)
+            self._statusbar.showMessage(
+                f"{full.gc_code} — {full.name}"
+            )
 
     def _on_search_changed(self, text: str) -> None:
         QTimer.singleShot(300, self._refresh_cache_list)
@@ -469,8 +492,24 @@ class MainWindow(QMainWindow):
     def _open_import_dialog(self) -> None:
         from opensak.gui.dialogs.import_dialog import ImportDialog
         dlg = ImportDialog(self)
-        dlg.import_completed.connect(self._refresh_cache_list)
+        # Efter import: reload kun tabellen — ikke kortet (for mange pins ved store DB'er)
+        dlg.import_completed.connect(self._refresh_table_only)
         dlg.exec()
+
+    def _refresh_table_only(self) -> None:
+        """Reload cache-tabellen uden at opdatere kortet. Bruges efter import."""
+        fs = self._build_current_filterset()
+        with get_session() as session:
+            caches = apply_filters(session, fs, SortSpec("name"))
+        self._cache_table.load_caches(caches)
+        count = self._cache_table.row_count()
+        if count == 1:
+            self._count_lbl.setText(tr("count_cache_single"))
+        else:
+            self._count_lbl.setText(tr("count_caches", count=count))
+        self._statusbar.showMessage(
+            tr("import_table_loaded", count=count), 5000
+        )
 
     def _open_settings(self) -> None:
         from opensak.gui.dialogs.settings_dialog import SettingsDialog
@@ -644,8 +683,11 @@ class MainWindow(QMainWindow):
             for i in range(self._cache_table.row_count())
         ]
         caches = [c for c in caches if c is not None]
-        dlg = TripPlannerDialog(self, caches=caches)
-        dlg.exec()
+        # show() i stedet for exec() — ikke-modal så kortvinduet kan få fokus
+        self._trip_planner_win = TripPlannerDialog(self, caches=caches)
+        self._trip_planner_win.show()
+        self._trip_planner_win.raise_()
+        self._trip_planner_win.activateWindow()
 
     def _open_found_updater(self) -> None:
         from opensak.gui.dialogs.found_dialog import FoundUpdaterDialog

@@ -17,6 +17,8 @@ from PySide6.QtWidgets import (
 
 from opensak.db.models import Cache
 from opensak.lang import tr
+from opensak.coords import format_coords, parse_coords
+from opensak.gui.settings import get_settings
 
 
 # ── Konstanter ────────────────────────────────────────────────────────────────
@@ -54,6 +56,9 @@ class WaypointDialog(QDialog):
         super().__init__(parent)
         self._cache = cache
         self._is_edit = cache is not None
+        # Parsed koordinater gemmes her
+        self._parsed_lat: Optional[float] = None
+        self._parsed_lon: Optional[float] = None
         self.setWindowTitle(tr("wp_dialog_title_edit") if self._is_edit else tr("wp_dialog_title_add"))
         self.setMinimumSize(520, 580)
         self._setup_ui()
@@ -89,21 +94,27 @@ class WaypointDialog(QDialog):
         self._container.addItems(CONTAINER_SIZES)
         basic_layout.addRow(tr("wp_label_container"), self._container)
 
-        # Koordinater
+        # Koordinater — tekstfelt med parse-feedback (samme mønster som corrected_coords_dialog)
         coord_group = QGroupBox(tr("wp_label_coords"))
-        coord_layout = QFormLayout(coord_group)
+        coord_layout = QVBoxLayout(coord_group)
+        coord_layout.setSpacing(4)
 
-        self._lat = QDoubleSpinBox()
-        self._lat.setRange(-90.0, 90.0)
-        self._lat.setDecimals(6)
-        self._lat.setSingleStep(0.0001)
-        coord_layout.addRow(tr("wp_label_lat"), self._lat)
+        fmt = get_settings().coord_format
+        placeholder = {
+            "dmm": "N55 47.250 E012 25.000",
+            "dms": "N55° 47' 15\" E012° 25' 00\"",
+            "dd":  "55.78750, 12.41667",
+        }.get(fmt, "N55 47.250 E012 25.000")
 
-        self._lon = QDoubleSpinBox()
-        self._lon.setRange(-180.0, 180.0)
-        self._lon.setDecimals(6)
-        self._lon.setSingleStep(0.0001)
-        coord_layout.addRow(tr("wp_label_lon"), self._lon)
+        self._coord_input = QLineEdit()
+        self._coord_input.setPlaceholderText(placeholder)
+        self._coord_input.textChanged.connect(self._on_coord_changed)
+        coord_layout.addWidget(self._coord_input)
+
+        self._coord_feedback = QLabel("")
+        self._coord_feedback.setStyleSheet("font-size: 10px;")
+        self._coord_feedback.setWordWrap(True)
+        coord_layout.addWidget(self._coord_feedback)
 
         basic_layout.addRow(coord_group)
 
@@ -202,6 +213,30 @@ class WaypointDialog(QDialog):
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
 
+    def _on_coord_changed(self, text: str) -> None:
+        """Parse koordinat-input og vis feedback i brugerens format."""
+        text = text.strip()
+        if not text:
+            self._coord_feedback.setText("")
+            self._parsed_lat = None
+            self._parsed_lon = None
+            return
+
+        result = parse_coords(text)
+        if result is not None:
+            lat, lon = result
+            self._parsed_lat = lat
+            self._parsed_lon = lon
+            fmt = get_settings().coord_format
+            display = format_coords(lat, lon, fmt)
+            self._coord_feedback.setText(f"✓  {display}")
+            self._coord_feedback.setStyleSheet("color: #2e7d32; font-size: 10px;")
+        else:
+            self._parsed_lat = None
+            self._parsed_lon = None
+            self._coord_feedback.setText(tr("corrected_dialog_parse_error"))
+            self._coord_feedback.setStyleSheet("color: #c62828; font-size: 10px;")
+
     def _populate(self, cache: Cache) -> None:
         """Udfyld felterne med data fra en eksisterende cache."""
         self._gc_code.setText(cache.gc_code or "")
@@ -215,10 +250,13 @@ class WaypointDialog(QDialog):
         if idx >= 0:
             self._container.setCurrentIndex(idx)
 
-        if cache.latitude:
-            self._lat.setValue(cache.latitude)
-        if cache.longitude:
-            self._lon.setValue(cache.longitude)
+        # Vis koordinater i brugerens valgte format
+        if cache.latitude is not None and cache.longitude is not None:
+            fmt = get_settings().coord_format
+            self._coord_input.setText(format_coords(cache.latitude, cache.longitude, fmt))
+            self._parsed_lat = cache.latitude
+            self._parsed_lon = cache.longitude
+
         if cache.difficulty:
             self._difficulty.setValue(cache.difficulty)
         if cache.terrain:
@@ -253,6 +291,12 @@ class WaypointDialog(QDialog):
             QMessageBox.warning(self, tr("warning"), tr("wp_val_name_required"))
             return
 
+        # Koordinat-feltet er udfyldt men ikke parset korrekt
+        coord_text = self._coord_input.text().strip()
+        if coord_text and self._parsed_lat is None:
+            QMessageBox.warning(self, tr("warning"), tr("corrected_dialog_parse_error"))
+            return
+
         self.accept()
 
     def get_data(self) -> dict:
@@ -262,8 +306,8 @@ class WaypointDialog(QDialog):
             "name":              self._name.text().strip(),
             "cache_type":        self._cache_type.currentText(),
             "container":         self._container.currentText(),
-            "latitude":          self._lat.value(),
-            "longitude":         self._lon.value(),
+            "latitude":          self._parsed_lat,
+            "longitude":         self._parsed_lon,
             "difficulty":        self._difficulty.value(),
             "terrain":           self._terrain.value(),
             "placed_by":         self._placed_by.text().strip() or None,

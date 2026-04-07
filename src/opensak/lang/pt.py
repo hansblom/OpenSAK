@@ -128,7 +128,10 @@ STRINGS: dict[str, str] = {
     "import_no_file":               "Nenhum ficheiro selecionado",
     "import_browse_title":          "Selecionar ficheiro GPX ou ZIP",
     "import_file_filter":           "Ficheiros GPX e ZIP (*.gpx *.zip);;Todos os ficheiros (*)",
-    "import_running_file":          "A importar {name}…",
+    "import_running_file":          "Importing {name}…",
+    "import_progress":              "Processing caches: {count}…",
+    "import_saving":               "A guardar na base de dados…",
+    "import_table_loaded":         "✓ {count} caches carregadas — clique num cache para ver o mapa",
     "import_log_placeholder":       "Os resultados da importação aparecerão aqui…",
 
     # ── Filter dialog ─────────────────────────────────────────────────────────
@@ -194,7 +197,6 @@ STRINGS: dict[str, str] = {
     "db_activate":                  "Ativar",
     "db_active_marker":             "(ativa)",
     "db_delete_confirm_title":      "Eliminar base de dados",
-    "db_delete_confirm_msg":        "Tem a certeza que deseja eliminar a base de dados '{name}'?\nO ficheiro será eliminado permanentemente.",
     "db_cannot_delete_active":      "A base de dados ativa não pode ser eliminada.\nMude para outra base de dados primeiro.",
 
     # ── Found updater dialog ──────────────────────────────────────────────────
@@ -225,15 +227,6 @@ STRINGS: dict[str, str] = {
     "wp_val_gc_invalid":            "O Código GC deve começar por 'GC'.",
     "wp_val_name_required":         "O nome é obrigatório.",
 
-    # ── Import dialog ─────────────────────────────────────────────────────────
-    "import_select_file_label":     "Selecione um ficheiro GPX ou ficheiro ZIP de Pocket Query:",
-    "import_no_file":               "(nenhum ficheiro selecionado)",
-    "import_browse_title":          "Selecionar ficheiro GPX ou ZIP",
-    "import_file_filter":           "Ficheiros Geocaching (*.gpx *.zip);;Ficheiros GPX (*.gpx);;Ficheiros ZIP (*.zip)",
-    "import_running_file":          "A importar {name}…",
-    "import_log_placeholder":       "O resultado da importação será mostrado aqui…",
-    "import_again":                 "Importar novamente",
-
     # ── GPS dialog ────────────────────────────────────────────────────────────
     "gps_delete_cb_tooltip":        "Apaga todos os ficheiros .gpx na pasta Garmin/GPX do dispositivo\nanter de carregar o novo ficheiro. Aplica-se apenas ao carregamento direto para GPS.",
     "gps_log_placeholder":          "O estado será mostrado aqui…",
@@ -257,6 +250,7 @@ STRINGS: dict[str, str] = {
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "Nova base de dados",
     "db_name_label":                "Nome:",
+    "db_new_info":                  "A base de dados é guardada automaticamente na pasta da aplicação.\nPode alterar a localização abaixo (opcional).",
     "db_default_path":              "(localização predefinida)",
     "db_name_required":             "Por favor, insira um nome para a base de dados.",
     "db_browse_title":              "Selecionar localização",
@@ -373,9 +367,7 @@ STRINGS: dict[str, str] = {
 
     # ── Toolbar extras ────────────────────────────────────────────────────────
     "toolbar_fit_all":              "Ajustar todas",
-    "toolbar_home":                 "Início",
     "toolbar_fit_all_tooltip":      "Ajustar mapa a todas as caches",
-    "toolbar_home_tooltip":         "Ir para as coordenadas de casa",
 
     # ── Cache table columns ───────────────────────────────────────────────────
     "col_status_icon":  "Ícone de estado",
@@ -624,7 +616,7 @@ STRINGS: dict[str, str] = {
     "toolbar_trip":                 "Planeador de Viagem",
     "toolbar_trip_tooltip":         "Planear uma viagem de geocaching",
     "toolbar_home":                 "Início",
-    "toolbar_home_tooltip":         "Mover mapa para o ponto de casa",
+    "toolbar_home_tooltip":         "Ir para as coordenadas de casa",
 
 
     "trip_center_info":                        "📍 O raio é calculado a partir do seu ponto central (definido nas Configurações). Defina o raio como 0 para ver todas as caches sem filtragem por distância.",
@@ -686,6 +678,19 @@ STRINGS: dict[str, str] = {
     "trip_btn_preview_map_tooltip":            "Abrir caches selecionadas num mapa interativo",
     "trip_map_preview_title":                  "Planeador de Viagem — Pré-visualização no Mapa",
     "trip_map_preview_info":                   "{count} caches mostradas — o planeador de viagem permanece aberto",
+
+    # Planeador de viagem — guardar na base de dados
+    "trip_btn_save_db":                        "🗄️  Guardar na base de dados…",
+    "trip_btn_save_db_tooltip":                "Guardar as caches selecionadas numa base de dados OpenSAK nova ou existente",
+    "trip_db_choice_title":                    "Guardar na base de dados",
+    "trip_db_choice_label":                    "Escolher destino:",
+    "trip_db_choice_new":                      "Criar nova base de dados",
+    "trip_db_choice_existing":                 "Adicionar a uma base existente",
+    "trip_db_new_title":                       "Guardar nova base de dados",
+    "trip_db_open_title":                      "Abrir base de dados existente",
+    "trip_db_filter":                          "Bases de dados OpenSAK (*.db);;Todos os ficheiros (*)",
+    "trip_db_saved_title":                     "Guardado",
+    "trip_db_saved_msg":                       "Adicionadas {added} caches, ignoradas {skipped} (já existentes) — {path}",
 
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "Geral",

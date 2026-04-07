@@ -12,6 +12,124 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.6.5] — 2026-04-07
+### Fixed
+- **"Fix: hardcoded dansih text in DB dialog close issue #28 "**
+
+---
+
+## [1.6.4] — 2026-04-07
+### Fixed
+- **"Fix: import of GPX file from gc.com with duplicated logs close issue #19 "**
+
+---
+
+## [1.6.3] — 2026-04-06
+### Fixed
+- **"Fix: Logs not displayed on cache page, close issue #18 "**
+  - Strict file type validation for imports, pull request 27 by Fabio-A-Sa
+
+### Files changed
+A       .github/ISSUE_TEMPLATE/bug_report.yml
+A       .github/ISSUE_TEMPLATE/feature_request.yml
+A       .github/ISSUE_TEMPLATE/improvement.yml
+M       .gitignore
+M       CHANGELOG.md
+M       src/opensak/__init__.py
+M       src/opensak/api/geocaching.py
+M       src/opensak/gui/dialogs/import_dialog.py
+M       src/opensak/gui/mainwindow.py
+M       src/opensak/lang/cs.py
+M       src/opensak/lang/da.py
+M       src/opensak/lang/en.py
+M       src/opensak/lang/fr.py
+M       src/opensak/lang/pt.py
+M       src/opensak/utils/doctor.py
+M       src/opensak/utils/run_cli.py
+M       src/opensak/utils/run_test.py
+A       src/opensak/utils/types.py
+M       src/opensak/utils/utils.py
+M       tests/test_languages.py
+
+---
+
+## [1.6.2] — 2026-04-06
+### Fixed
+- **"Fix: remove duplicate key and translate missing French strings in fr.py"**
+---
+
+## [1.6.1] — 2026-04-06
+### Fixed
+- **GPX import: large files no longer freeze** — debug code removed
+---
+
+## [1.6.0] — 2026-04-06
+### Fixed
+- **GPX import: large files no longer freeze** — complete rewrite of import engine:
+  - Caches are now committed to database in batches of 200 instead of one giant transaction
+  - Waypoint lookup uses a single in-memory dict instead of 11,000 individual LIKE queries (3 min → 3 sec)
+  - `apply_filters()` no longer eager-loads logs/waypoints/user_note for all caches — loaded on-demand when a cache is selected
+  - Table reload after import skips map update — map updates lazily when a cache is clicked
+  - Successfully tested with 53,415 caches and 19,644 waypoints from a full GSAK export
+- **GPX import: 0 skipped waypoints** — extra waypoints with unknown prefix formats (e.g. `JJ28J63`, `Q14N2QD`) are now correctly parsed using the `Waypoint|type` field
+- **GPX import: duplicate waypoints** — GSAK exports sometimes include each waypoint twice; duplicates are now deduplicated before insert
+- **GPX import: UNIQUE constraint on logs** — all negative GSAK dummy log IDs (−2, −3, …) are now treated as dummy and given a generated unique ID
+- **Database migration** message no longer repeats on startup
+
+### Changed
+- Live progress counter shown in import dialog during large imports
+- Import dialog shows "Saving to database…" during final commit phase
+- After import, status bar shows cache count and prompts user to click a cache to view map
+
+### Files changed
+- `src/opensak/importer/__init__.py`
+- `src/opensak/filters/engine.py`
+- `src/opensak/db/database.py`
+- `src/opensak/gui/dialogs/import_dialog.py`
+- `src/opensak/gui/mainwindow.py`
+- `src/opensak/lang/da.py`, `en.py`, `fr.py`, `pt.py`, `cs.py`
+
+---
+
+## [1.5.2] — 2026-04-05
+### Fixed
+- **Coordinate parser** now accepts the geocaching.com copy-paste format `N 34° 58.088' E 034° 03.281'` (DMM with degree sign and apostrophe) — no manual editing required (fixes #9)
+- **Edit cache dialog** — coordinates are now displayed in the user's chosen format (DMM/DMS/DD) instead of raw decimal degrees; accepts all supported formats including paste from geocaching.com
+
+### Files changed
+- `src/opensak/coords.py`
+- `src/opensak/gui/dialogs/waypoint_dialog.py`
+
+---
+
+## [1.5.1] — 2026-04-05
+### Added
+- **Fix: import GPX from GSAK** — fix issue with multiple WP
+
+---
+
+## [1.5.0] — 2026-04-05
+### Added
+- **Trip Planner: Save to database** — export selected trip caches directly to a new or existing OpenSAK database:
+  - Choose between creating a new `.db` file or adding to an existing one
+  - Duplicate GC codes are automatically skipped; a summary shows how many were added vs. skipped
+  - File dialog opens in the same folder as the active database for easy access
+- **Trip Planner: Live map updates** — the map preview now refreshes automatically whenever the cache selection changes (count, filters, radius, route), no need to close and reopen the map
+
+### Fixed
+- **Trip Planner: Map preview** is now a fully interactive, independent window — zoom, pan and cache popups work correctly; the window no longer stays locked behind the Trip Planner dialog
+- **Trip Planner** is now non-blocking (`show()` instead of `exec()`) so the map window and the planner can be used side by side
+
+### Changed
+- All five language files updated with new Trip Planner strings (`da`, `en`, `fr`, `pt`, `cs`)
+
+### Files changed
+- `src/opensak/gui/dialogs/trip_dialog.py`
+- `src/opensak/gui/mainwindow.py`
+- `src/opensak/lang/da.py`, `en.py`, `fr.py`, `pt.py`, `cs.py`
+
+---
+
 ## [1.4.8] — 2026-04-04
 ### Added
 - **Attributes** updated thanks to Pierre Lejeune

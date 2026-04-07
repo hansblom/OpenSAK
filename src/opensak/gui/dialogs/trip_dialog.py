@@ -181,6 +181,12 @@ class _PreviewMixin:
         self._btn_export_file.clicked.connect(self._export_to_file)
         btn_row.addWidget(self._btn_export_file)
 
+        self._btn_save_db = QPushButton(tr("trip_btn_save_db"))
+        self._btn_save_db.setEnabled(False)
+        self._btn_save_db.setToolTip(tr("trip_btn_save_db_tooltip"))
+        self._btn_save_db.clicked.connect(self._save_to_database)
+        btn_row.addWidget(self._btn_save_db)
+
         btn_row.addStretch()
 
         self._btn_preview_map = QPushButton(tr("trip_btn_preview_map"))
@@ -208,6 +214,7 @@ class _PreviewMixin:
 
         self._btn_export_gps.setEnabled(count > 0 and not warning)
         self._btn_export_file.setEnabled(count > 0 and not warning)
+        self._btn_save_db.setEnabled(count > 0 and not warning)
         self._btn_preview_map.setEnabled(count > 0 and not warning)
 
         s = get_settings()
@@ -269,10 +276,108 @@ class _PreviewMixin:
         """Åbn popup-vindue med de valgte tur-caches vist på kort."""
         if not self._selected_caches:
             return
-        # parent=None — QWebEngineView må ikke være child af en QDialog.
-        # Gem reference så Python GC ikke sletter vinduet med det samme.
-        self._map_preview_win = TripMapPreviewDialog(self._selected_caches)
-        self._map_preview_win.show()
+        from PySide6.QtWidgets import QApplication
+        # Gem reference på QApplication så vinduet lever uafhængigt af dialogen
+        # og ikke lukkes når Trip Planner lukkes
+        app = QApplication.instance()
+        win = TripMapPreviewDialog(self._selected_caches)
+        # Gem på app-objektet så GC ikke sletter det
+        app._trip_map_win = win
+        win.show()
+        win.raise_()
+        win.activateWindow()
+
+    def _save_to_database(self) -> None:
+        """Gem de valgte tur-caches i en ny eller eksisterende database."""
+        if not self._selected_caches:
+            return
+
+        from PySide6.QtWidgets import QFileDialog, QInputDialog
+        from opensak.db.database import _make_engine, _run_migrations
+        from opensak.db.models import Base, Cache as CacheModel
+        from sqlalchemy.orm import Session
+        from sqlalchemy import select
+
+        # ── Vælg: ny eller eksisterende database ─────────────────────────────
+        choices = [
+            tr("trip_db_choice_new"),
+            tr("trip_db_choice_existing"),
+        ]
+        choice, ok = QInputDialog.getItem(
+            self,
+            tr("trip_db_choice_title"),
+            tr("trip_db_choice_label"),
+            choices, 0, False,
+        )
+        if not ok:
+            return
+
+        new_db = (choice == tr("trip_db_choice_new"))
+
+        # Brug samme mappe som den aktive database som default
+        try:
+            from opensak.db.manager import get_db_manager
+            default_dir = get_db_manager().active_path.parent
+        except Exception:
+            default_dir = Path.home()
+
+        if new_db:
+            path, _ = QFileDialog.getSaveFileName(
+                self,
+                tr("trip_db_new_title"),
+                str(default_dir / "tur.db"),
+                tr("trip_db_filter"),
+            )
+        else:
+            path, _ = QFileDialog.getOpenFileName(
+                self,
+                tr("trip_db_open_title"),
+                str(default_dir),
+                tr("trip_db_filter"),
+            )
+
+        if not path:
+            return
+
+        db_path = Path(path)
+
+        try:
+            engine = _make_engine(db_path)
+            # Opret tabeller hvis de ikke findes (ny database)
+            Base.metadata.create_all(engine)
+            _run_migrations(engine)
+
+            added = 0
+            skipped = 0
+
+            with Session(engine) as session:
+                for src in self._selected_caches:
+                    # Tjek om GC-kode allerede findes
+                    exists = session.scalar(
+                        select(CacheModel).where(
+                            CacheModel.gc_code == src.gc_code
+                        )
+                    )
+                    if exists:
+                        skipped += 1
+                        continue
+
+                    # Kopier cache til ny session (detach fra original session)
+                    new_cache = CacheModel()
+                    # Kopiér alle kolonneværdier
+                    for col in CacheModel.__table__.columns:
+                        setattr(new_cache, col.name, getattr(src, col.name, None))
+
+                    session.add(new_cache)
+                    added += 1
+
+                session.commit()
+
+            msg = tr("trip_db_saved_msg", added=added, skipped=skipped, path=db_path.name)
+            QMessageBox.information(self, tr("trip_db_saved_title"), msg)
+
+        except Exception as e:
+            QMessageBox.critical(self, tr("error"), str(e))
 
 
 # ── Hoved-dialog ─────────────────────────────────────────────────────────────
@@ -359,7 +464,7 @@ class TripPlannerDialog(_PreviewMixin, QDialog):
         close_row = QHBoxLayout()
         close_row.addStretch()
         close_btn = QPushButton(tr("close"))
-        close_btn.clicked.connect(self.accept)
+        close_btn.clicked.connect(self.close)
         close_row.addWidget(close_btn)
         layout.addLayout(close_row)
 
@@ -753,17 +858,27 @@ class TripPlannerDialog(_PreviewMixin, QDialog):
         self._selected_caches = caches if not warning else []
         self._populate_table(caches, dist_map, warning)
 
+        # Opdater kortvinduet automatisk hvis det er åbent
+        from PySide6.QtWidgets import QApplication
+        app = QApplication.instance()
+        win = getattr(app, "_trip_map_win", None)
+        if win is not None and win.isVisible() and self._selected_caches:
+            win.update_caches(self._selected_caches)
+
 
 # ── Kort-preview dialog ───────────────────────────────────────────────────────
 
-class TripMapPreviewDialog(QDialog):
+class TripMapPreviewDialog(QWidget):
     """
-    Ikke-blokerende popup der viser de valgte tur-caches på et interaktivt kort.
-    Brugeren kan holde turplanlæggeren åben ved siden af.
+    Ikke-blokerende kortvindue der viser de valgte tur-caches.
+    Bruger QWidget med Qt.Window flag — det eneste der fungerer pålideligt
+    som selvstændigt top-level vindue med QWebEngineView på X11/Cinnamon.
+    Gemmes på QApplication så det lever uafhængigt af Trip Planner dialogen.
     """
 
     def __init__(self, caches: list):
-        super().__init__(None)   # parent=None — krævet af QWebEngineView
+        # Ingen parent + Qt.Window = ægte selvstændigt vindue
+        super().__init__(None, Qt.WindowType.Window)
         self.setWindowTitle(tr("trip_map_preview_title"))
         self.setMinimumSize(700, 500)
         self.resize(820, 580)
@@ -777,9 +892,9 @@ class TripMapPreviewDialog(QDialog):
         layout.setSpacing(6)
 
         # Info-linje
-        info = QLabel(tr("trip_map_preview_info", count=len(self._caches)))
-        info.setStyleSheet("color: gray; font-style: italic; font-size: 10px;")
-        layout.addWidget(info)
+        self._info_lbl = QLabel(tr("trip_map_preview_info", count=len(self._caches)))
+        self._info_lbl.setStyleSheet("color: gray; font-style: italic; font-size: 10px;")
+        layout.addWidget(self._info_lbl)
 
         # Kort
         from opensak.gui.map_widget import MapWidget
@@ -796,3 +911,9 @@ class TripMapPreviewDialog(QDialog):
 
         # Indlæs caches — map_widget loader asynkront når siden er klar
         self._map.load_caches(self._caches)
+
+    def update_caches(self, caches: list) -> None:
+        """Opdater kortet med nye caches — kaldes automatisk fra Trip Planner."""
+        self._caches = caches
+        self._info_lbl.setText(tr("trip_map_preview_info", count=len(caches)))
+        self._map.load_caches(caches)

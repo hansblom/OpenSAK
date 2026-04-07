@@ -129,6 +129,9 @@ STRINGS: dict[str, str] = {
     "import_browse_title":          "Vælg GPX eller ZIP fil",
     "import_file_filter":           "GPX og ZIP filer (*.gpx *.zip);;Alle filer (*)",
     "import_running_file":          "Importerer {name}…",
+    "import_progress":              "Behandler caches: {count}…",
+    "import_saving":               "Gemmer til database…",
+    "import_table_loaded":         "✓ {count} caches indlæst — klik på en cache for at se kortet",
     "import_log_placeholder":       "Import-resultat vises her…",
 
     # ── Filter dialog ─────────────────────────────────────────────────────────
@@ -194,7 +197,6 @@ STRINGS: dict[str, str] = {
     "db_activate":                  "Aktiver",
     "db_active_marker":             "(aktiv)",
     "db_delete_confirm_title":      "Slet database",
-    "db_delete_confirm_msg":        "Er du sikker på at du vil slette databasen '{name}'?\nFilen slettes permanent.",
     "db_cannot_delete_active":      "Den aktive database kan ikke slettes.\nSkift til en anden database først.",
 
     # ── Fund-opdater dialog ───────────────────────────────────────────────────
@@ -225,15 +227,6 @@ STRINGS: dict[str, str] = {
     "wp_val_gc_invalid":            "GC Kode skal starte med 'GC'.",
     "wp_val_name_required":         "Navn er påkrævet.",
 
-    # ── Import dialog ─────────────────────────────────────────────────────────
-    "import_select_file_label":     "Vælg en GPX fil eller Pocket Query ZIP fil:",
-    "import_no_file":               "(ingen fil valgt)",
-    "import_browse_title":          "Vælg GPX eller ZIP fil",
-    "import_file_filter":           "Geocaching filer (*.gpx *.zip);;GPX filer (*.gpx);;ZIP filer (*.zip)",
-    "import_running_file":          "Importerer {name}…",
-    "import_log_placeholder":       "Importresultat vises her…",
-    "import_again":                 "Importer igen",
-
     # ── GPS dialog ────────────────────────────────────────────────────────────
     "gps_delete_cb_tooltip":        "Sletter alle .gpx filer i Garmin/GPX mappen på enheden\ninden den nye fil uploades. Virker kun ved direkte GPS-upload.",
     "gps_log_placeholder":          "Status vises her…",
@@ -257,6 +250,7 @@ STRINGS: dict[str, str] = {
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "Ny database",
     "db_name_label":                "Navn:",
+    "db_new_info":                  "Databasen gemmes automatisk i app-mappen.\nDu kan ændre placeringen nedenfor (valgfrit).",
     "db_default_path":              "(standard placering)",
     "db_name_required":             "Indtast et navn til databasen.",
     "db_browse_title":              "Vælg placering",
@@ -372,9 +366,7 @@ STRINGS: dict[str, str] = {
 
     # ── Toolbar ekstra ────────────────────────────────────────────────────────
     "toolbar_fit_all":              "Vis alle",
-    "toolbar_home":                 "Hjem",
     "toolbar_fit_all_tooltip":      "Zoom kortet til alle caches",
-    "toolbar_home_tooltip":         "Gå til hjemkoordinat",
 
     # ── Cache tabel kolonner ──────────────────────────────────────────────────
     "col_status_icon":  "Status ikon",
@@ -685,6 +677,19 @@ STRINGS: dict[str, str] = {
     "trip_btn_preview_map_tooltip":            "Åbn de valgte caches på et interaktivt kort",
     "trip_map_preview_title":                  "Turplanlægger — Kortvisning",
     "trip_map_preview_info":                   "{count} caches vist — turplanlæggeren forbliver åben",
+
+    # Turplanlægger — gem i database
+    "trip_btn_save_db":                        "🗄️  Gem i database…",
+    "trip_btn_save_db_tooltip":                "Gem de valgte tur-caches i en ny eller eksisterende OpenSAK database",
+    "trip_db_choice_title":                    "Gem i database",
+    "trip_db_choice_label":                    "Vælg destination:",
+    "trip_db_choice_new":                      "Opret ny database",
+    "trip_db_choice_existing":                 "Føj til eksisterende database",
+    "trip_db_new_title":                       "Gem ny database",
+    "trip_db_open_title":                      "Åbn eksisterende database",
+    "trip_db_filter":                          "OpenSAK databaser (*.db);;Alle filer (*)",
+    "trip_db_saved_title":                     "Gemt",
+    "trip_db_saved_msg":                       "Tilføjet {added} caches, sprunget {skipped} over (fandtes allerede) — {path}",
 
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "Generelt",

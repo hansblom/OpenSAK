@@ -124,11 +124,14 @@ STRINGS: dict[str, str] = {
     "import_errors_header":         "Erreurs ({count}) :",
     "import_failed":                "✗ Échec de l'importation :",
     "import_again":                 "Importer à nouveau",
-    "import_select_file_label":     "Sélectionner un fichier GPX ou ZIP Pocket Query :",
+    "import_select_file_label":     "Sélectionnez un fichier GPX ou un fichier ZIP de Pocket Query :",
     "import_no_file":               "Aucun fichier sélectionné",
     "import_browse_title":          "Sélectionner un fichier GPX ou ZIP",
     "import_file_filter":           "Fichiers GPX et ZIP (*.gpx *.zip);;Tous les fichiers (*)",
     "import_running_file":          "Importation de {name}…",
+    "import_progress":              "Nombre de caches traitées : {count}…",
+    "import_saving":               "Enregistrement dans la base de données…",
+    "import_table_loaded":         "✓ {count} caches chargées — cliquez sur un cache pour voir la carte",
     "import_log_placeholder":       "Les résultats d'importation s'afficheront ici…",
 
     # ── Filter dialog ─────────────────────────────────────────────────────────
@@ -194,7 +197,6 @@ STRINGS: dict[str, str] = {
     "db_activate":                  "Activer",
     "db_active_marker":             "(active)",
     "db_delete_confirm_title":      "Supprimer la base de données",
-    "db_delete_confirm_msg":        "Êtes-vous sûr de vouloir supprimer la base de données '{name}'?\nLe fichier sera supprimé de manière permanente.",
     "db_cannot_delete_active":      "La base de données active ne peut pas être supprimée.\nVeuillez basculer vers une autre base de données en premier.",
 
     # ── Found updater dialog ──────────────────────────────────────────────────
@@ -225,15 +227,6 @@ STRINGS: dict[str, str] = {
     "wp_val_gc_invalid":            "Le code GC doit commencer par 'GC'.",
     "wp_val_name_required":         "Le nom est requis.",
 
-    # ── Import dialog ─────────────────────────────────────────────────────────
-    "import_select_file_label":     "Sélectionnez un fichier GPX ou une archive ZIP de Pocket Query :",
-    "import_no_file":               "(aucun fichier sélectionné)",
-    "import_browse_title":          "Sélectionnez un fichier GPX ou ZIP",
-    "import_file_filter":           "Fichiers de géocaching (*.gpx *.zip);;Fichiers GPX (*.gpx);;Fichiers ZIP (*.zip)",
-    "import_running_file":          "Importation de {name}…",
-    "import_log_placeholder":       "Le résultat de l'importation sera affiché ici…",
-    "import_again":                 "Importer à nouveau",
-
     # ── GPS dialog ────────────────────────────────────────────────────────────
     "gps_delete_cb_tooltip":        "Supprimer tous les fichiers .gpx du dossier Garmin/GPX sur l'appareil\navant le téléchargement du nouveau fichier. S'applique uniquement au téléchargement GPS direct.",
     "gps_log_placeholder":          "Le statut sera affiché ici…",
@@ -257,6 +250,7 @@ STRINGS: dict[str, str] = {
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "Nouvelle base de données",
     "db_name_label":                "Nom:",
+    "db_new_info":                  "La base de données est enregistrée automatiquement dans le dossier de l'application.\nVous pouvez modifier l'emplacement ci-dessous (facultatif).",
     "db_default_path":              "(Emplacement par défaut)",
     "db_name_required":             "Veuillez entrer un nom pour la base de données.",
     "db_browse_title":              "Sélectionner l'emplacement",
@@ -372,9 +366,7 @@ STRINGS: dict[str, str] = {
 
     # ── Toolbar extras ────────────────────────────────────────────────────────
     "toolbar_fit_all":              "Afficher tout",
-    "toolbar_home":                 "Base",
     "toolbar_fit_all_tooltip":      "Zoomer la carte sur toutes les caches",
-    "toolbar_home_tooltip":         "Aller aux coordonnées de base",
 
     # ── Cache table columns ───────────────────────────────────────────────────
     "col_status_icon":  "Icone de statut",
@@ -685,6 +677,19 @@ STRINGS: dict[str, str] = {
     "trip_btn_preview_map_tooltip":            "Ouvrir les caches sélectionnées sur une carte interactive",
     "trip_map_preview_title":                  "Planificateur — Aperçu carte",
     "trip_map_preview_info":                   "{count} caches affichées — le planificateur reste ouvert",
+
+    # Planificateur — enregistrer dans une base de données
+    "trip_btn_save_db":                        "🗄️  Enregistrer dans une base…",
+    "trip_btn_save_db_tooltip":                "Enregistrer les caches sélectionnées dans une base de données OpenSAK nouvelle ou existante",
+    "trip_db_choice_title":                    "Enregistrer dans une base de données",
+    "trip_db_choice_label":                    "Choisir la destination :",
+    "trip_db_choice_new":                      "Créer une nouvelle base de données",
+    "trip_db_choice_existing":                 "Ajouter à une base existante",
+    "trip_db_new_title":                       "Enregistrer une nouvelle base de données",
+    "trip_db_open_title":                      "Ouvrir une base de données existante",
+    "trip_db_filter":                          "Bases OpenSAK (*.db);;Tous les fichiers (*)",
+    "trip_db_saved_title":                     "Enregistré",
+    "trip_db_saved_msg":                       "{added} caches ajoutées, {skipped} ignorées (déjà présentes) — {path}",
 
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "Général",

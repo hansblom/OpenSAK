@@ -20,6 +20,7 @@ class ImportWorker(QThread):
     """Runs the import in a background thread so the UI stays responsive."""
     finished = Signal(object)   # emits ImportResult
     error    = Signal(str)
+    progress = Signal(int)      # emits antal behandlede caches
 
     def __init__(self, path: Path):
         super().__init__()
@@ -29,18 +30,31 @@ class ImportWorker(QThread):
         try:
             from opensak.db.database import init_db, get_session
             from opensak.importer import import_gpx, import_zip
+            from opensak.utils.utils import get_import_type, ImportType
 
-            # Ensure DB is initialised in this thread too
+            import_type: ImportType = get_import_type(self.path)
+
             init_db()
 
             with get_session() as session:
-                if self.path.suffix.lower() == ".zip":
-                    result = import_zip(self.path, session)
-                else:
-                    result = import_gpx(self.path, session)
+                importers = {
+                    ImportType.GPX: import_gpx,
+                    ImportType.ZIP: import_zip,
+                }
+
+                import_func = importers[import_type]
+                    
+                result = import_func(
+                    self.path, 
+                    session, 
+                    progress_cb=self.progress.emit
+                )
 
             self.finished.emit(result)
-        except Exception as e:
+                
+        except ValueError as e:
+            self.error.emit(str(e))
+        except Exception:
             import traceback
             self.error.emit(traceback.format_exc())
 
@@ -128,7 +142,22 @@ class ImportDialog(QDialog):
         self._worker = ImportWorker(self._selected_path)
         self._worker.finished.connect(self._on_finished)
         self._worker.error.connect(self._on_error)
+        self._worker.progress.connect(self._on_progress)
         self._worker.start()
+
+    def _on_progress(self, count: int) -> None:
+        """Opdater log med løbende tæller under import."""
+        if count < 0:
+            # Negativt tal = signal om at vi gemmer til disk
+            self._log.setPlainText(
+                tr("import_running_file", name=self._selected_path.name)
+                + f"\n\n  {tr('import_saving')}"
+            )
+        elif count % 100 == 0:
+            self._log.setPlainText(
+                tr("import_running_file", name=self._selected_path.name)
+                + f"\n\n  {tr('import_progress', count=count)}"
+            )
 
     def _on_finished(self, result) -> None:
         self._progress.setVisible(False)

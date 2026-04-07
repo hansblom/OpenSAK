@@ -56,6 +56,7 @@ def _enable_wal_and_fk(dbapi_connection, _connection_record) -> None:
 
 _engine: Engine | None = None
 _SessionLocal: sessionmaker | None = None
+_migrated_paths: set = set()  # undgår at køre migrationer to gange på samme DB
 
 
 def init_db(db_path: Path | None = None) -> Engine:
@@ -101,12 +102,12 @@ def init_db(db_path: Path | None = None) -> Engine:
     # Create all tables that don't exist yet (safe to call multiple times)
     Base.metadata.create_all(_engine)
 
-    # Kør schema-migrationer for eksisterende databaser
-    _run_migrations(_engine)
+    # Kør schema-migrationer for eksisterende databaser (kun én gang per DB-sti)
+    if db_path not in _migrated_paths:
+        _run_migrations(_engine)
+        _migrated_paths.add(db_path)
 
     return _engine
-
-
 
 
 # ── Schema migrationer ────────────────────────────────────────────────────────
@@ -130,6 +131,48 @@ def _run_migrations(engine: Engine) -> None:
             ))
             conn.commit()
             print("Migration: tilføjede user_notes.is_corrected")
+
+        # ── Migration 2: Udvid waypoints unique constraint ────────────────────
+        # Den gamle constraint (cache_id, prefix) fejler når GSAK eksporterer
+        # flere waypoints med samme prefix (f.eks. "WP") for samme cache.
+        # Ny constraint: (cache_id, prefix, name) — tillader flere WP-waypoints
+        # så længe de har forskellige navne.
+        idx_rows = conn.execute(text(
+            "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='waypoints'"
+        )).fetchall()
+        idx_names = [r[0] for r in idx_rows]
+
+        if "uq_waypoint_cache_prefix_name" not in idx_names:
+            # SQLite understøtter ikke DROP CONSTRAINT — vi recreater tabellen
+            conn.execute(text("PRAGMA foreign_keys=OFF"))
+            conn.execute(text("""
+                CREATE TABLE waypoints_new (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    cache_id    INTEGER NOT NULL REFERENCES caches(id),
+                    prefix      TEXT,
+                    wp_type     TEXT,
+                    name        TEXT,
+                    description TEXT,
+                    comment     TEXT,
+                    latitude    REAL,
+                    longitude   REAL,
+                    UNIQUE(cache_id, prefix, name)
+                )
+            """))
+            conn.execute(text(
+                "INSERT INTO waypoints_new "
+                "SELECT id, cache_id, prefix, wp_type, name, description, comment, latitude, longitude "
+                "FROM waypoints"
+            ))
+            conn.execute(text("DROP TABLE waypoints"))
+            conn.execute(text("ALTER TABLE waypoints_new RENAME TO waypoints"))
+            conn.execute(text(
+                "CREATE INDEX IF NOT EXISTS ix_waypoints_cache_id ON waypoints (cache_id)"
+            ))
+            conn.execute(text("PRAGMA foreign_keys=ON"))
+            conn.commit()
+            print("Migration: opdaterede waypoints unique constraint til (cache_id, prefix, name)")
+
 
 def get_engine() -> Engine:
     """Return the current engine, raising if init_db() hasn't been called."""
@@ -161,6 +204,13 @@ def get_session() -> Generator[Session, None, None]:
         raise
     finally:
         session.close()
+
+
+def make_session():
+    """Return a bare Session — caller handles commit/rollback/close."""
+    if _SessionLocal is None:
+        raise RuntimeError("Database not initialised — call init_db() first.")
+    return _SessionLocal()
 
 
 # ── Health-check helper ───────────────────────────────────────────────────────

@@ -1,8 +1,8 @@
 """
-src/opensak/lang/en.py — English language file for OpenSAK.
+src/opensak/lang/cs.py — Czech language file for OpenSAK.
 
 All UI strings collected in one place.
-Copy this file from 'en.py' to a new file (e.g., en.py) and translate the values.
+Copy this file from 'cs.py' to a new file (e.g., sk.py) and translate the values.
 The keys (left side) must NEVER be changed — they are used in the code.
 """
 
@@ -124,11 +124,14 @@ STRINGS: dict[str, str] = {
     "import_errors_header":         "Chyby ({count}):",
     "import_failed":                "✗ Import selhal:",
     "import_again":                 "Importovat znovu",
-    "import_select_file_label":     "Vyberte soubor GPX nebo ZIP Pocket Query:",
+    "import_select_file_label":     "Vyberte soubor GPX nebo Pocket Query ZIP:",
     "import_no_file":               "Žádný soubor nevybrán",
     "import_browse_title":          "Vyberte soubor GPX nebo ZIP",
     "import_file_filter":           "Soubory GPX a ZIP (*.gpx *.zip);;Všechny soubory (*)",
-    "import_running_file":          "Importuji {name}…",
+    "import_running_file":          "Importing {name}…",
+    "import_progress":              "Processing caches: {count}…",
+    "import_saving":               "Ukládání do databáze…",
+    "import_table_loaded":         "✓ {count} keší načteno — kliknutím zobrazíte mapu",
     "import_log_placeholder":       "Výsledky importu se zobrazí zde…",
     
     # ── Filter dialog ─────────────────────────────────────────────────────────
@@ -194,7 +197,6 @@ STRINGS: dict[str, str] = {
     "db_activate":                  "Aktivovat",
     "db_active_marker":             "(aktivní)",
     "db_delete_confirm_title":      "Smazat databázi",
-    "db_delete_confirm_msg":        "Opravdu chcete smazat databázi '{name}'?\\nSoubor bude trvale smazán.",
     "db_cannot_delete_active":      "Aktivní databázi nelze smazat.\\nNejprve přepněte na jinou databázi.",
 
     # ── Found updater dialog ──────────────────────────────────────────────────
@@ -225,15 +227,6 @@ STRINGS: dict[str, str] = {
     "wp_val_gc_invalid":            "GC kód musí začínat 'GC'.",
     "wp_val_name_required":         "Název je povinný.",
 
-    # ── Import dialog ─────────────────────────────────────────────────────────
-    "import_select_file_label":     "Vyberte GPX soubor nebo ZIP soubor Pocket Query:",
-    "import_no_file":               "(žádný soubor nevybrán)",
-    "import_browse_title":          "Vyberte GPX nebo ZIP soubor",
-    "import_file_filter":           "Geocachingové soubory (*.gpx *.zip);;GPX soubory (*.gpx);;ZIP soubory (*.zip)",
-    "import_running_file":          "Importuji {name}…",
-    "import_log_placeholder":       "Výsledek importu se zobrazí zde…",
-    "import_again":                 "Importovat znovu",
-
     # ── GPS dialog ────────────────────────────────────────────────────────────
     "gps_delete_cb_tooltip":        "Smaže všechny .gpx soubory ve složce Garmin/GPX na zařízení\\npřed nahráním nového souboru. Platí pouze pro přímé nahrávání do GPS.",
     "gps_log_placeholder":          "Stav se zobrazí zde…",
@@ -257,6 +250,7 @@ STRINGS: dict[str, str] = {
     # ── Database dialog ───────────────────────────────────────────────────────
     "db_new_title":                 "Nová databáze",
     "db_name_label":                "Název:",
+    "db_new_info":                  "Databáze je automaticky uložena ve složce aplikace.\nNíže můžete umístění změnit (volitelné).",
     "db_default_path":              "(výchozí umístění)",
     "db_name_required":             "Zadejte prosím název databáze.",
     "db_browse_title":              "Vybrat umístění",
@@ -373,9 +367,7 @@ STRINGS: dict[str, str] = {
 
     # ── Toolbar extras ────────────────────────────────────────────────────────
     "toolbar_fit_all":              "Zobrazit vše",
-    "toolbar_home":                 "Domů",
     "toolbar_fit_all_tooltip":      "Přiblížit mapu na všechny keše",
-    "toolbar_home_tooltip":         "Přejít na domácí souřadnice",
 
     # ── Cache table columns ───────────────────────────────────────────────────
     "col_status_icon":  "Ikona stavu",
@@ -681,6 +673,19 @@ STRINGS: dict[str, str] = {
     "trip_btn_preview_map_tooltip":            "Otevřít vybrané keše na interaktivní mapě",
     "trip_map_preview_title":                  "Plánovač výletu — náhled mapy",
     "trip_map_preview_info":                   "Zobrazeno {count} keší — plánovač výletu zůstává otevřený",
+
+    # Plánovač výletu — uložit do databáze
+    "trip_btn_save_db":                        "🗄️  Uložit do databáze…",
+    "trip_btn_save_db_tooltip":                "Uložit vybrané keše výletu do nové nebo existující databáze OpenSAK",
+    "trip_db_choice_title":                    "Uložit do databáze",
+    "trip_db_choice_label":                    "Vyberte cíl:",
+    "trip_db_choice_new":                      "Vytvořit novou databázi",
+    "trip_db_choice_existing":                 "Přidat do existující databáze",
+    "trip_db_new_title":                       "Uložit novou databázi",
+    "trip_db_open_title":                      "Otevřít existující databázi",
+    "trip_db_filter":                          "Databáze OpenSAK (*.db);;Všechny soubory (*)",
+    "trip_db_saved_title":                     "Uloženo",
+    "trip_db_saved_msg":                       "Přidáno {added} keší, přeskočeno {skipped} (již existují) — {path}",
 
     # ── Geocaching.com integration ────────────────────────────────────────────
     "settings_tab_general":         "Obecné",
