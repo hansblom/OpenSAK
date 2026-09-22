@@ -372,9 +372,9 @@ STRINGS: dict[str, str] = {
     "wizard_step_of": "Steg {current} av {total}",
     "wizard_settings_file_exists_title": "Inställningsfilen finns redan",
     "wizard_settings_file_exists_msg": "Mappen \"{path}\" innehåller redan en opensak.json-fil, så dina nuvarande inställningar flyttades inte dit. Den befintliga filen lämnades orörd — kontrollera gärna mappen manuellt.",
-    "settings_group_nominatim":                    "Location refinement",
-    "settings_nominatim_cb":                       "Enable online lookup for higher accuracy",
-    "settings_nominatim_hint":                     "When enabled, county, state and country data is further refined using OpenStreetMap after the fast offline pass.\n\nNote: requires an internet connection and takes about 1 second per waypoint. A database of 10 000 waypoints takes around 3 hours to fully refine. Leave this off unless you need higher accuracy near administrative boundaries.",
+    "settings_group_nominatim":                    "Förfining av plats",
+    "settings_nominatim_cb":                       "Aktivera onlinesökning för högre noggrannhet",
+    "settings_nominatim_hint":                     "När funktionen är aktiverad förfinas data för län, delstat och land ytterligare med hjälp av OpenStreetMap efter den snabba offline-körningen.\n\nObs! Kräver internetanslutning och tar cirka 1 sekund per waypoint. Det tar ungefär 3 timmar att fullständigt förfina en databas med 10 000 waypoints. Låt funktionen vara avstängd om du inte behöver högre precision nära administrativa gränser.",
 
     "settings_group_folders": "Mappar",
     "settings_install_dir_label": "Installationsmapp (inställningar och loggar):",
