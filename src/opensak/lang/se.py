@@ -434,7 +434,6 @@ STRINGS: dict[str, str] = {
         "Vincenty uses the WGS84 ellipsoid and is ~0.3 % more accurate on "
         "long distances. Distances are recalculated whenever the centre point "
         "changes, not on every table refresh.",
-
     "update_uptodate_title":        "Ingen uppdatering",
     "update_uptodate_msg":          "Du använder den senaste versionen av OpenSAK.",
 
