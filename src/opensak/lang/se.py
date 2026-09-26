@@ -425,16 +425,15 @@ STRINGS: dict[str, str] = {
     "settings_update_check_label":   "Kontrollera automatiskt efter nya versioner vid uppstart",
     "settings_notify_betas_label": "Meddela mig även om betaversioner",
 
-    "settings_group_distance":          "Distance Calculation",
-    "settings_distance_method_label":   "Method:",
-    "settings_distance_haversine":      "Haversine (Groundspeak compatible)",
-    "settings_distance_vincenty":       "Vincenty WGS84 (higher accuracy)",
+    "settings_group_distance":          "Avståndsberäkning",
+    "settings_distance_method_label":   "Metod:",
+    "settings_distance_haversine":      "Haversine (Groundspeak kompatibel)",
+    "settings_distance_vincenty":       "Vincenty WGS84 (större noggrannhet)",
     "settings_distance_hint":
-        "Haversine treats the Earth as a sphere (matches Geocaching.com). "
-        "Vincenty uses the WGS84 ellipsoid and is ~0.3 % more accurate on "
-        "long distances. Distances are recalculated whenever the centre point "
-        "changes, not on every table refresh.",
-
+        "Haversine räknar med jorden som en sfär (samma som Geocaching.com)."
+        "Vincenty använder WGS84 ellipsoiden och är ~0.3 % mer noggrann på "
+        "långa avstånd. Avstånden räknas om varje gång mittpunkten ändras, "
+        "inte vid varje uppdatering av tabellen."
     "update_uptodate_title":        "Ingen uppdatering",
     "update_uptodate_msg":          "Du använder den senaste versionen av OpenSAK.",
 
