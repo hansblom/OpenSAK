@@ -156,7 +156,7 @@ STRINGS: dict[str, str] = {
     "macro_help_title":             "Lua-makro-API",
     "macro_help_search":            "Sök i referensen",
     "macro_help_contents":          "Innehåll",
-    "action_update_location":       "Update waypoint locations…",
+    "action_update_location":       "Uppdatera waypoint positioner…",
     "action_download_boundaries":   "Ladda ner gränspaket…",
     "action_check_boundaries":      "Sök efter uppdateringar av gränsdata…",
     "action_gps_export":            "📤  Skicka till GPS…",
@@ -532,16 +532,15 @@ STRINGS: dict[str, str] = {
     "settings_update_check_label":   "Kontrollera automatiskt efter nya versioner vid uppstart",
     "settings_notify_betas_label": "Meddela mig även om betaversioner",
 
-    "settings_group_distance":          "Distance Calculation",
+    "settings_group_distance":          "Avstånds berökning",
     "settings_distance_method_label":   "Method:",
-    "settings_distance_haversine":      "Haversine (Groundspeak compatible)",
-    "settings_distance_vincenty":       "Vincenty WGS84 (higher accuracy)",
+    "settings_distance_haversine":      "Haversine (kompatibel med Groundspeak)",
+    "settings_distance_vincenty":       "Vincenty WGS84 högre noggrannhet)",
     "settings_distance_hint":
-        "Haversine treats the Earth as a sphere (matches Geocaching.com). "
-        "Vincenty uses the WGS84 ellipsoid and is ~0.3 % more accurate on "
-        "long distances. Distances are recalculated whenever the centre point "
-        "changes, not on every table refresh.",
-
+        "Haversine behandlar Jorden som en sfär (samma som Geocaching.com)."
+        "Vincenty använder WGS84 ellipsoiden och är ~0.3 % mer precis på "
+        "långa avstånd. Avstånden räknas om när mittpunkten "
+        "flyttas, inte vid varje uppdatering av tabellen.",
     "update_uptodate_title":        "Ingen uppdatering",
     "update_uptodate_msg":          "Du använder den senaste versionen av OpenSAK.",
 
